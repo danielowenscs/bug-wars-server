@@ -2,14 +2,13 @@ package net.crusadergames.bugwars.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.crusadergames.bugwars.model.auth.User;
-
 import java.time.LocalDate;
 
 @Entity
@@ -20,7 +19,7 @@ import java.time.LocalDate;
 public class Script {
     @JsonIgnore
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long script_id;
 
     @NotBlank
