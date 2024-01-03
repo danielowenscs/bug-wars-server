@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.dto.request.controller;
+package net.crusadergames.bugwars.controller;
 
 import net.crusadergames.bugwars.dto.request.ScriptRequest;
 import net.crusadergames.bugwars.model.Script;

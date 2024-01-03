@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.controller;
+package net.crusadergames.bugwars.dto.request;
 
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

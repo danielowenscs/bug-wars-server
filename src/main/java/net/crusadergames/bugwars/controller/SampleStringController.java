@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.dto.request.controller;
+package net.crusadergames.bugwars.controller;
 
 import net.crusadergames.bugwars.model.SampleString;
 import net.crusadergames.bugwars.service.SampleStringService;
