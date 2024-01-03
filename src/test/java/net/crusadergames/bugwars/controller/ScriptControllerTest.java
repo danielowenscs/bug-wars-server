@@ -1,10 +1,11 @@
 package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.crusadergames.bugwars.dto.request.ScriptRequest;
 import net.crusadergames.bugwars.model.Script;
+import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.service.ScriptService;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,8 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.testcontainers.shaded.com.google.common.base.Optional;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -41,18 +41,15 @@ public class ScriptControllerTest {
     @Test
     @WithMockUser
     public void postScript_returnsScriptResponse() throws Exception {
-
         ScriptRequest scriptRequest = new ScriptRequest(); // populate with test data
         Script script = new Script(); // populate with test data
         when(userRepository.findByUsername(anyString())).thenReturn(Optional.of(new User())); // replace with actual test data
         when(scriptService.createNewScript(anyLong(), any(ScriptRequest.class))).thenReturn(script);
 
-        ResultActions response = mockMvc.perform(post("/api/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(scriptRequest)));
-
-        response.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.token", CoreMatchers.is("token")));
+        ResultActions response = mockMvc.perform(post("/script/post")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(scriptRequest)))
+                .andExpect(status().isOk());
     }
 }
 
