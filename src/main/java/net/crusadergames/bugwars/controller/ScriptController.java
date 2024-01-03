@@ -1,5 +1,6 @@
-package net.crusadergames.bugwars.controller;
+package net.crusadergames.bugwars.dto.request.controller;
 
+import net.crusadergames.bugwars.dto.request.ScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.UserRepository;

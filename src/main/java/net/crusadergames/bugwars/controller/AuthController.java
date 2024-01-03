@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.controller;
+package net.crusadergames.bugwars.dto.request.controller;
 
 import jakarta.validation.Valid;
 import net.crusadergames.bugwars.dto.request.LoginRequest;
