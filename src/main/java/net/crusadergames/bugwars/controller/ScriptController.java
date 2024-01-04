@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -32,4 +33,8 @@ public class ScriptController {
         return new ResponseEntity<>(script, HttpStatus.OK);
     }
 
+    @RequestMapping(path = "/all", method = RequestMethod.GET)
+    public List<Script> getAllScripts(@RequestParam Long userId) {
+        return getAllScripts(userId)
+    }
 }

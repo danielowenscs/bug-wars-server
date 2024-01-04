@@ -1,7 +1,9 @@
 package net.crusadergames.bugwars;
 
+import net.crusadergames.bugwars.dto.request.ScriptRequest;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
 
 @SpringBootApplication
 public class BugWarsApplication {
