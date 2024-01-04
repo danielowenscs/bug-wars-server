@@ -16,35 +16,30 @@ import java.security.Principal;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/script")
+@RequestMapping("/api/scripts")
 @PreAuthorize("isAuthenticated()")
 public class ScriptController {
-
     @Autowired
     ScriptService scriptService;
 
     @Autowired
     UserRepository userRepository;
 
-    @PostMapping("/post")
+
+
+    @PostMapping()
     public ResponseEntity<ScriptResponse> postScript(@RequestBody ScriptRequest scriptRequest, Principal principal) {
         Optional<User> user = userRepository.findByUsername(principal.getName());
         Script script = scriptService.createNewScript(user.get().getId(), scriptRequest);
-        ScriptResponse responseDTO = toScriptResponseDTO(script);
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
 
-
-
-    public ScriptResponse toScriptResponseDTO(Script script){
-        if (script == null || script.getUser() == null) {
-            throw new IllegalArgumentException("Script or its user cannot be null");
+        if(user == null || script == null){
+            throw new IllegalArgumentException("User of script cannot be null");
         }
-        ScriptResponse dto = new ScriptResponse(script.getScript_id(),script.getScript_name(),script.getBody(),
+        ScriptResponse responseDTO = new ScriptResponse(script.getScript_id(),script.getScript_name(),script.getBody(),
                 script.getDate_created(),script.getDate_Updated(),script.getUser().getId());
-
-        return dto;
-
+        return new ResponseEntity<ScriptResponse>(responseDTO, HttpStatus.OK);
     }
+
+
 
 }
