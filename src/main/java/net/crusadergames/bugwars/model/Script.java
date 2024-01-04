@@ -6,9 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import net.crusadergames.bugwars.model.auth.User;
 import java.time.LocalDate;
 
@@ -17,6 +15,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
 public class Script {
     @JsonIgnore
     @Id
@@ -39,6 +38,5 @@ public class Script {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User user;
-
 
 }

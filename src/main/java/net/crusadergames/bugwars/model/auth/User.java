@@ -53,6 +53,12 @@ public class User {
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     private List<Script> scripts;
 
+    public User(Long id, String username, String email) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+
+    }
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;

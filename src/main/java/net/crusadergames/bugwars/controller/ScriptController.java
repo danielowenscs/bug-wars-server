@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.controller;
 
 import net.crusadergames.bugwars.dto.request.ScriptRequest;
+import net.crusadergames.bugwars.dto.response.ScriptResponse;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
@@ -26,10 +27,24 @@ public class ScriptController {
     UserRepository userRepository;
 
     @PostMapping("/post")
-    public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptResponse, Principal principal) {
+    public ResponseEntity<ScriptResponse> postScript(@RequestBody ScriptRequest scriptRequest, Principal principal) {
         Optional<User> user = userRepository.findByUsername(principal.getName());
-        Script script = scriptService.createNewScript(user.get().getId(), scriptResponse);
-        return new ResponseEntity<>(script, HttpStatus.OK);
+        Script script = scriptService.createNewScript(user.get().getId(), scriptRequest);
+        ScriptResponse responseDTO = toScriptResponseDTO(script);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+
+
+    public ScriptResponse toScriptResponseDTO(Script script){
+        if (script == null || script.getUser() == null) {
+            throw new IllegalArgumentException("Script or its user cannot be null");
+        }
+        ScriptResponse dto = new ScriptResponse(script.getScript_id(),script.getScript_name(),script.getBody(),
+                script.getDate_created(),script.getDate_Updated(),script.getUser().getId());
+
+        return dto;
+
     }
 
 }
