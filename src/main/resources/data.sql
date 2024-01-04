@@ -13,3 +13,6 @@ INSERT INTO user_roles (user_id, role_id)
 VALUES
     ((SELECT id FROM users WHERE username = 'test_user'), (SELECT id FROM roles WHERE name = 'ROLE_USER'))
 ON CONFLICT (user_id, role_id) DO NOTHING;
+INSERT INTO scripts (script_name, body, date_created,date_Updated,owner_id)
+VALUES
+('Script 1','Testing Body', '01-01-2024','01-01-2024',(SELECT id FROM users WHERE username = 'test_user'));

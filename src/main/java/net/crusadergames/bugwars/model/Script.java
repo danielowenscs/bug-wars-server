@@ -19,8 +19,9 @@ import java.time.LocalDate;
 public class Script {
     @JsonIgnore
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long script_id;
+
 
     @NotBlank
     @Size(max = 25)

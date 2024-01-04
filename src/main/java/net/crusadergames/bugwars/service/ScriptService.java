@@ -7,12 +7,13 @@ import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.repository.script.ScriptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+@CrossOrigin(origins = "*")
 @Service
 public class ScriptService {
 
@@ -21,6 +22,7 @@ public class ScriptService {
 
     @Autowired
     UserRepository userRepository;
+
 
     public Script createNewScript(Long user_id, ScriptRequest scriptRequest) {
         Optional<User> user = userRepository.findById(user_id);
