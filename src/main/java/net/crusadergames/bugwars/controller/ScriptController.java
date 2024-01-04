@@ -15,21 +15,19 @@ import java.security.Principal;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/script")
+@RequestMapping("/api/scripts")
 @PreAuthorize("isAuthenticated()")
 public class ScriptController {
-
     @Autowired
     ScriptService scriptService;
 
     @Autowired
     UserRepository userRepository;
 
-    @PostMapping("/post")
+    @PostMapping()
     public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptResponse, Principal principal) {
         Optional<User> user = userRepository.findByUsername(principal.getName());
         Script script = scriptService.createNewScript(user.get().getId(), scriptResponse);
         return new ResponseEntity<>(script, HttpStatus.OK);
     }
-
 }
