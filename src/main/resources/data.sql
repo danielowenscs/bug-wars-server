@@ -13,3 +13,6 @@ INSERT INTO user_roles (user_id, role_id)
 VALUES
     ((SELECT id FROM users WHERE username = 'test_user'), (SELECT id FROM roles WHERE name = 'ROLE_USER'))
 ON CONFLICT (user_id, role_id) DO NOTHING;
+
+INSERT INTO scripts (date_created, date_updated, owner_id, script_id, body, script_name) 
+VALUES ('2023-12-25', '2024-01-01', 1, 1, 'This is a test', 'Test Script' );

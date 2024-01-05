@@ -40,11 +40,14 @@ public class ScriptService {
         return null;
     }
 
-    public Script getAllScripts(Long user_id, ScriptRequest scriptRequest) {
+    public List<Script> getAllScripts(Long user_id) {
         Optional<User> user = userRepository.findById(user_id);
         if(user.isPresent()){
-
+            List<Script> scriptList = new ArrayList<>();
+            scriptList = user.get().getScripts();
+            return scriptList;
         }
         return null;
     }
+
 }

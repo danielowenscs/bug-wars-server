@@ -16,25 +16,26 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/script")
+@RequestMapping("/api/scripts")
 @PreAuthorize("isAuthenticated()")
 public class ScriptController {
-
     @Autowired
     ScriptService scriptService;
 
     @Autowired
     UserRepository userRepository;
 
-    @PostMapping("/post")
+    @PostMapping()
     public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptResponse, Principal principal) {
         Optional<User> user = userRepository.findByUsername(principal.getName());
         Script script = scriptService.createNewScript(user.get().getId(), scriptResponse);
         return new ResponseEntity<>(script, HttpStatus.OK);
     }
 
-    @RequestMapping(path = "/all", method = RequestMethod.GET)
-    public List<Script> getAllScripts(@RequestParam Long userId) {
-        return getAllScripts(userId)
+    @GetMapping("/all")
+    public ResponseEntity<List<Script>> getAllScripts(Principal principal) {
+        Optional<User> user = userRepository.findByUsername(principal.getName());
+        List<Script> scriptList= scriptService.getAllScripts(user.get().getId());
+        return new ResponseEntity<>(scriptList, HttpStatus.OK);
     }
 }
