@@ -4,6 +4,7 @@ import net.crusadergames.bugwars.dto.request.ScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
+import net.crusadergames.bugwars.repository.script.ScriptRepository;
 import net.crusadergames.bugwars.service.ScriptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,10 +25,19 @@ public class ScriptController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    ScriptRepository scriptRepository;
+
     @PostMapping()
     public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptResponse, Principal principal) {
         Optional<User> user = userRepository.findByUsername(principal.getName());
         Script script = scriptService.createNewScript(user.get().getId(), scriptResponse);
         return new ResponseEntity<>(script, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{scriptId}")
+    public ResponseEntity<?> deleteScript(@PathVariable Long scriptId, Principal principal){
+        System.out.println(principal.toString());
+        return scriptService.deleteScriptById(scriptId, principal);
     }
 }
