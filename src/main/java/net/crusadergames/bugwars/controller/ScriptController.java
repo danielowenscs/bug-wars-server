@@ -37,7 +37,6 @@ public class ScriptController {
 
     @DeleteMapping("/{scriptId}")
     public ResponseEntity<?> deleteScript(@PathVariable Long scriptId, Principal principal){
-        System.out.println(principal.toString());
         return scriptService.deleteScriptById(scriptId, principal);
     }
 }
