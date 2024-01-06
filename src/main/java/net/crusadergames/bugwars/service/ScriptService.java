@@ -110,7 +110,7 @@ public class ScriptService {
             }
 
             LocalDate currentDate = LocalDate.now();
-            Script newScript = new Script(null, oldScript.getScript_name(), oldScript.getBody(), oldScript.getDate_created(), currentDate, currentUser);
+            Script newScript = new Script(scriptId, scriptRequest.getScript_name(), scriptRequest.getScript_body(), oldScript.getDate_created(), currentDate, currentUser);
             scriptRepository.save(newScript);
             userRepository.save(currentUser);
             return newScript;
