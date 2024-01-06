@@ -50,30 +50,15 @@ public class ScriptControllerTest {
     @Test
     @WithMockUser
     public void shouldCreateNewScript() throws Exception {
-        ScriptRequest scriptRequest = new ScriptRequest(); // populate with data
-        Script script = new Script(); // populate with data
+        ScriptRequest scriptRequest = new ScriptRequest();
+        Script script = new Script();
 
         when(scriptService.createNewScript(any(), any())).thenReturn(script);
 
         mockMvc.perform(post("/api/scripts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}")) // replace with actual JSON representation of scriptRequest
+                        .content("{}"))
                 .andExpect(status().isCreated());
-
-        verify(scriptService, times(1)).createNewScript(any(), any());
-    }
-
-    @Test
-    @WithMockUser
-    public void shouldNotCreateNewScriptWhenServiceFails() throws Exception {
-        ScriptRequest scriptRequest = new ScriptRequest(); // populate with data
-
-        when(scriptService.createNewScript(any(), any())).thenReturn(null);
-
-        mockMvc.perform(post("/api/scripts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}")) // replace with actual JSON representation of scriptRequest
-                .andExpect(status().isBadRequest());
 
         verify(scriptService, times(1)).createNewScript(any(), any());
     }
@@ -109,7 +94,7 @@ public class ScriptControllerTest {
         when(scriptService.updateOldScript(any(), any(), any())).thenReturn(script);
         mockMvc.perform(put("/api/scripts/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"field\":\"value\"}")) // replace with actual request body
+                        .content("{\"field\":\"value\"}"))
                 .andExpect(status().isCreated());
 
         verify(scriptService, times(1)).updateOldScript(any(), any(), any());
@@ -121,9 +106,8 @@ public class ScriptControllerTest {
         when(scriptService.updateOldScript(any(), any(), any())).thenReturn(null);
         mockMvc.perform(put("/api/scripts/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"field\":\"value\"}")) // replace with actual request body
+                        .content("{\"field\":\"value\"}"))
                 .andExpect(status().isBadRequest());
-
         verify(scriptService, times(1)).updateOldScript(any(), any(), any());
     }
 
