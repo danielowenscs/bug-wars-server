@@ -53,12 +53,9 @@ public class ScriptControllerTest {
 
     @Test
     public void postScriptTest() throws Exception {
-        ScriptRequest scriptRequest = new ScriptRequest(); // Create a ScriptRequest object
-        Principal principal = () -> "username"; // Create a Principal object
-
+        ScriptRequest scriptRequest = new ScriptRequest();
+        Principal principal = () -> "username";
        when(scriptService.createNewScript(principal, scriptRequest)).thenReturn(null);
-
-        // Set up security context
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken("testUser", "password"));
 
