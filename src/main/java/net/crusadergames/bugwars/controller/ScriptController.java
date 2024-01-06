@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -29,14 +30,35 @@ public class ScriptController {
     ScriptRepository scriptRepository;
 
     @PostMapping()
-    public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptResponse, Principal principal) {
-        Optional<User> user = userRepository.findByUsername(principal.getName());
-        Script script = scriptService.createNewScript(user.get().getId(), scriptResponse);
-        return new ResponseEntity<>(script, HttpStatus.OK);
+    public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptRequest, Principal principal) {
+        Script script = scriptService.createNewScript(principal, scriptRequest);
+        if(script == null){
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(script, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{scriptId}")
     public void deleteScript(@PathVariable Long scriptId, Principal principal){
         scriptService.deleteScriptById(scriptId, principal);
     }
+
+    @GetMapping
+    public List<Script> getUserScripts(Principal principal) {
+        return scriptService.getScriptsByUser(principal);
+    }
+
+    @GetMapping("/{scriptId}")
+    public ResponseEntity<Script> getScript(@PathVariable Long scriptId, Principal principal) {
+        return scriptService.getScript(scriptId, principal);
+    }
+
+
+    // not work
+    @PutMapping("/{scriptId}")
+    public ResponseEntity<Script> updateScript(@RequestBody ScriptRequest scriptRequest, Principal principal, @PathVariable Long scriptId) {
+        //Script script = scriptService.updateOldScript(principal, scriptRequest, scriptId);
+        return null;
+    }
+
 }
