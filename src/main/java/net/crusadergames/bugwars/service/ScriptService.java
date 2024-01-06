@@ -52,7 +52,7 @@ public class ScriptService {
             throw new ScriptNotFoundException();
         }
         if (user.isEmpty()) {
-           throw new UserNotFoundException();
+            throw new UserNotFoundException();
         }
         Script script = optionalScript.get();
         User currentUser = user.get();
@@ -91,7 +91,7 @@ public class ScriptService {
             if (optionalUser.isEmpty()) {
                 throw new UserNotFoundException();
             }
-            if(optionalScript.isEmpty()){
+            if (optionalScript.isEmpty()) {
                 throw new ScriptNotFoundException();
             }
 
@@ -112,4 +112,12 @@ public class ScriptService {
 
     }
 
+    public List<Script> getAllScriptsByUser(Principal principal) {
+        Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+        User user = optionalUser.get();
+        return scriptRepository.getScriptsByUser(user);
+    }
 }
