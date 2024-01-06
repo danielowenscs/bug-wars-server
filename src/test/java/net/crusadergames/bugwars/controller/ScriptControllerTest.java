@@ -21,7 +21,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.security.Principal;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -48,19 +52,17 @@ public class ScriptControllerTest {
     private ScriptController scriptController;
 
     @Test
-    @WithMockUser
-    public void shouldCreateNewScript() throws Exception {
+    public void postScriptTest() throws Exception {
         ScriptRequest scriptRequest = new ScriptRequest();
-        Script script = new Script();
-
-        when(scriptService.createNewScript(any(), any())).thenReturn(script);
+        Principal principal = () -> "username";
+       when(scriptService.createNewScript(principal, scriptRequest)).thenReturn(null);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("testUser", "password"));
 
         mockMvc.perform(post("/api/scripts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{}"))
-                .andExpect(status().isCreated());
-
-        verify(scriptService, times(1)).createNewScript(any(), any());
+                        .content(new ObjectMapper().writeValueAsString(scriptRequest)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -96,7 +98,6 @@ public class ScriptControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"field\":\"value\"}"))
                 .andExpect(status().isCreated());
-
         verify(scriptService, times(1)).updateOldScript(any(), any(), any());
     }
 
@@ -109,6 +110,17 @@ public class ScriptControllerTest {
                         .content("{\"field\":\"value\"}"))
                 .andExpect(status().isBadRequest());
         verify(scriptService, times(1)).updateOldScript(any(), any(), any());
+    }
+
+    @Test
+    @WithMockUser
+    public void shouldReturnAllScriptsByUser() throws Exception {
+        Script script1 = new Script();
+        Script script2 = new Script();
+        List<Script> scripts = Arrays.asList(script1, script2);
+        given(scriptService.getAllScriptsByUser(any())).willReturn(scripts);
+        mockMvc.perform(get("/api/scripts"))
+                .andExpect(status().isOk());
     }
 
 }
