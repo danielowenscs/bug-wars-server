@@ -56,5 +56,4 @@ public class ScriptController {
         }
         return new ResponseEntity<>(script, HttpStatus.CREATED);
     }
-
 }

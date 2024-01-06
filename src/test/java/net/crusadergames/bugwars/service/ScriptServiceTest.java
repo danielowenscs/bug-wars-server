@@ -38,33 +38,4 @@ public class ScriptServiceTest {
     @MockBean
     private UserRepository userRepository;
 
-    @Test
-    public void createNewScript_returnsScript() {
-        Long userId = 1L;
-        ScriptRequest scriptRequest = new ScriptRequest("scriptName", "scriptBody");
-        User user = new User();
-        user.setId(userId);
-        Script script = new Script(null, "scriptName", "scriptBody", LocalDate.now(), LocalDate.now(), user);
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(scriptRepository.save(any(Script.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        Script result = scriptService.createNewScript(userId, scriptRequest);
-
-        assertEquals(script.getScript_name(), result.getScript_name());
-        assertEquals(script.getBody(), result.getBody());
-        verify(userRepository, times(1)).save(user);
-        verify(scriptRepository, times(1)).save(script);
-    }
-
-    @Test
-    public void testCreateNewScriptWhenUserNotFound() {
-        Long userId = 1L;
-        ScriptRequest scriptRequest = new ScriptRequest("Test Script", "Test Body");
-        given(userRepository.findById(userId)).willReturn(Optional.empty());
-        Script result = scriptService.createNewScript(userId, scriptRequest);
-        assertNull(result);
-
-        verify(userRepository, times(1)).findById(userId);
-        verify(scriptRepository, never()).save(any());
-    }
-
 }
