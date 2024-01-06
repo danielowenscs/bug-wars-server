@@ -42,10 +42,14 @@ public class ScriptController {
         scriptService.deleteScriptById(scriptId, principal);
     }
 
-
     @GetMapping("/{scriptId}")
     public ResponseEntity<Script> getScript(@PathVariable Long scriptId, Principal principal) {
         return scriptService.getScript(scriptId, principal);
+    }
+
+    @GetMapping()
+    public List<Script> getUserScripts(Principal principal){
+        return scriptService.getAllScriptsByUser(principal);
     }
 
     @PutMapping("/{scriptId}")
