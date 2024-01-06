@@ -52,17 +52,36 @@ public class ScriptControllerTest {
     private ScriptController scriptController;
 
     @Test
-    public void postScriptTest() throws Exception {
+    @WithMockUser
+    public void shouldCreateNewScript() throws Exception {
         ScriptRequest scriptRequest = new ScriptRequest();
-        Principal principal = () -> "username";
-       when(scriptService.createNewScript(principal, scriptRequest)).thenReturn(null);
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("testUser", "password"));
+        scriptRequest.setScript_name("Test Script");
+        scriptRequest.setScript_body("This is a test script.");
+        Script script = new Script();
+        script.setScript_name(scriptRequest.getScript_name());
+        script.setBody(scriptRequest.getScript_body());
 
+        when(scriptService.createNewScript(any(), any())).thenReturn(script);
+        mockMvc.perform(post("/api/scripts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(scriptRequest)))
+                .andExpect(status().isCreated());
+        verify(scriptService, times(1)).createNewScript(any(), any());
+    }
+
+    @Test
+    @WithMockUser
+    public void shouldReturnBadRequestWhenScriptCreationFails() throws Exception {
+        ScriptRequest scriptRequest = new ScriptRequest();
+        scriptRequest.setScript_name("Test Script");
+        scriptRequest.setScript_body("This is a test script.");
+
+        when(scriptService.createNewScript(any(), any())).thenReturn(null);
         mockMvc.perform(post("/api/scripts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(new ObjectMapper().writeValueAsString(scriptRequest)))
                 .andExpect(status().isBadRequest());
+        verify(scriptService, times(1)).createNewScript(any(), any());
     }
 
     @Test
