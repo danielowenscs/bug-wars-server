@@ -36,16 +36,17 @@ public class ScriptController {
         return new ResponseEntity<>(script, HttpStatus.OK);
     }
 
-<<<<<<< HEAD
+
     @GetMapping("/all")
     public ResponseEntity<List<Script>> getAllScripts(Principal principal) {
         Optional<User> user = userRepository.findByUsername(principal.getName());
-        List<Script> scriptList= scriptService.getAllScripts(user.get().getId());
+        List<Script> scriptList = scriptService.getAllScripts(user.get().getId());
         return new ResponseEntity<>(scriptList, HttpStatus.OK);
-=======
-    @DeleteMapping("/{scriptId}")
-    public void deleteScript(@PathVariable Long scriptId, Principal principal){
-        scriptService.deleteScriptById(scriptId, principal);
->>>>>>> dev
     }
+
+    @DeleteMapping("/{scriptId}")
+    public void deleteScript (@PathVariable Long scriptId, Principal principal){
+        scriptService.deleteScriptById(scriptId, principal);
+    }
+
 }

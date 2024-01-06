@@ -29,9 +29,9 @@ public class ScriptService {
 
     public Script createNewScript(Long user_id, ScriptRequest scriptRequest) {
         Optional<User> user = userRepository.findById(user_id);
-        if(user.isPresent()){
+        if (user.isPresent()) {
             LocalDate currentDate = LocalDate.now();
-            Script script = new Script(null, scriptRequest.getScript_name(), scriptRequest.getScript_body(), currentDate,currentDate,user.get());
+            Script script = new Script(null, scriptRequest.getScript_name(), scriptRequest.getScript_body(), currentDate, currentDate, user.get());
             List<Script> userScripts = user.get().getScripts();
             if (userScripts == null) {
                 userScripts = new ArrayList<>();
@@ -45,16 +45,16 @@ public class ScriptService {
         return null;
     }
 
-<<<<<<< HEAD
     public List<Script> getAllScripts(Long user_id) {
         Optional<User> user = userRepository.findById(user_id);
-        if(user.isPresent()){
+        if (user.isPresent()) {
             List<Script> scriptList = new ArrayList<>();
-            scriptList = user.get().getScripts();
+            scriptList = scriptRepository.findByOwner_Id(user_id);
             return scriptList;
         }
         return null;
-=======
+    }
+
     public ResponseEntity<?> deleteScriptById(Long scriptId, Principal principal) {
         Optional<Script> optionalScript = scriptRepository.findById(scriptId);
         Optional<User> user = userRepository.findByUsername(principal.getName());
@@ -73,7 +73,7 @@ public class ScriptService {
         userRepository.save(currentUser);
         scriptRepository.deleteById(scriptId);
         return new ResponseEntity<>("Script deleted", HttpStatus.OK);
->>>>>>> dev
     }
-
 }
+
+

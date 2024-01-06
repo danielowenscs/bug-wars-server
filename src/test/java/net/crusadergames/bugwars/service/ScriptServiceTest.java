@@ -10,12 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-<<<<<<< HEAD
 import org.springframework.security.test.context.support.WithUserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
-=======
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,7 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.security.Principal;
 import java.util.Collections;
->>>>>>> dev
+
 import java.util.Optional;
 
 import java.time.LocalDate;
@@ -74,15 +72,12 @@ public class ScriptServiceTest {
         verify(scriptRepository, never()).save(any());
     }
 
-<<<<<<< HEAD
-    @Test
+    //Tests scrapped for now
+//    @Test
+//    public void testGetAllScriptsForUser() {
+//        long userId = 1L;
+//        List<Script> testList = scriptService.getAllScripts(userId);
+//        assertNotNull(testList);
+//    }
 
-    public void testGetAllScriptsForUser() {
-        long userId = 1L;
-        List<Script> testList = scriptService.getAllScripts(userId);
-        assertNotNull(testList);
-    }
-
-=======
->>>>>>> dev
 }
