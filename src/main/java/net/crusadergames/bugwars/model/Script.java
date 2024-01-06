@@ -1,6 +1,5 @@
 package net.crusadergames.bugwars.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.NotBlank;
@@ -18,7 +17,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Script {
-    @JsonIgnore
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long script_id;
