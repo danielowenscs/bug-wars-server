@@ -13,20 +13,9 @@ import java.util.List;
 @SpringBootApplication
 public class BugWarsApplication {
 
-	private static final ScriptService rest = new ScriptService();
 
 	public static void main(String[] args) {
 		SpringApplication.run(BugWarsApplication.class, args);
-
-		List<Script> listOfScripts = new ArrayList<>();
-		long user = 1;
-		rest.getAllScripts(user);
-		if (listOfScripts != null) {
-			listOfScripts.forEach(System.out::println);
-		} else {
-			System.out.println("Null");
-		}
-
 	}
 
 

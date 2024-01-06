@@ -5,16 +5,20 @@ import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.repository.script.ScriptRepository;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithUserDetails;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -60,5 +64,12 @@ public class ScriptServiceTest {
         verify(scriptRepository, never()).save(any());
     }
 
+    @Test
+
+    public void testGetAllScriptsForUser() {
+        long userId = 1L;
+        List<Script> testList = scriptService.getAllScripts(userId);
+        assertNotNull(testList);
+    }
 
 }
