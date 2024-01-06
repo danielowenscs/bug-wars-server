@@ -64,14 +64,6 @@ public class ScriptService {
         return new ResponseEntity<>("Script deleted", HttpStatus.OK);
     }
 
-    public List<Script> getScriptsByUser(Principal principal) {
-        Optional<User> user = userRepository.findByUsername(principal.getName());
-        if (user.isPresent()) {
-            return scriptRepository.findByUser(user.get());
-        }
-        return null;
-    }
-
     public ResponseEntity<Script> getScript(Long scriptId, Principal principal) {
         Optional<User> userOptional = userRepository.findByUsername(principal.getName());
         Optional<Script> scriptOptional = scriptRepository.findById(scriptId);

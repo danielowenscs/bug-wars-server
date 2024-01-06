@@ -42,10 +42,6 @@ public class ScriptController {
         scriptService.deleteScriptById(scriptId, principal);
     }
 
-    @GetMapping
-    public List<Script> getUserScripts(Principal principal) {
-        return scriptService.getScriptsByUser(principal);
-    }
 
     @GetMapping("/{scriptId}")
     public ResponseEntity<Script> getScript(@PathVariable Long scriptId, Principal principal) {
