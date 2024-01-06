@@ -2,7 +2,6 @@ package net.crusadergames.bugwars.controller;
 
 import net.crusadergames.bugwars.dto.request.ScriptRequest;
 import net.crusadergames.bugwars.model.Script;
-import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.repository.script.ScriptRepository;
 import net.crusadergames.bugwars.service.ScriptService;
@@ -13,8 +12,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.Optional;
+import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/scripts")
 @PreAuthorize("isAuthenticated()")
@@ -29,14 +29,31 @@ public class ScriptController {
     ScriptRepository scriptRepository;
 
     @PostMapping()
-    public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptResponse, Principal principal) {
-        Optional<User> user = userRepository.findByUsername(principal.getName());
-        Script script = scriptService.createNewScript(user.get().getId(), scriptResponse);
-        return new ResponseEntity<>(script, HttpStatus.OK);
+    public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptRequest, Principal principal) {
+        Script script = scriptService.createNewScript(principal, scriptRequest);
+        if(script == null){
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(script, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{scriptId}")
     public void deleteScript(@PathVariable Long scriptId, Principal principal){
         scriptService.deleteScriptById(scriptId, principal);
+    }
+
+
+    @GetMapping("/{scriptId}")
+    public ResponseEntity<Script> getScript(@PathVariable Long scriptId, Principal principal) {
+        return scriptService.getScript(scriptId, principal);
+    }
+
+    @PutMapping("/{scriptId}")
+    public ResponseEntity<Script> updateScript(@RequestBody ScriptRequest scriptRequest, Principal principal, @PathVariable Long scriptId) {
+        Script script = scriptService.updateOldScript(principal, scriptRequest, scriptId);
+        if(script == null){
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(script, HttpStatus.CREATED);
     }
 }
