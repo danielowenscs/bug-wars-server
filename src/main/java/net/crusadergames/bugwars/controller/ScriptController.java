@@ -52,8 +52,6 @@ public class ScriptController {
         return scriptService.getScript(scriptId, principal);
     }
 
-
-    // not work
     @PutMapping("/{scriptId}")
     public ResponseEntity<Script> updateScript(@RequestBody ScriptRequest scriptRequest, Principal principal, @PathVariable Long scriptId) {
         Script script = scriptService.updateOldScript(principal, scriptRequest, scriptId);
