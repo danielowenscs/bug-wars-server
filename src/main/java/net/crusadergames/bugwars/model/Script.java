@@ -24,7 +24,7 @@ public class Script {
 
     @NotBlank
     @Size(max = 25)
-    private String script_name;
+    private String name;
 
     @NotBlank
     private String body;

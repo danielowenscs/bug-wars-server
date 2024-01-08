@@ -1,10 +1,7 @@
 package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.dto.request.ScriptRequest;
-import net.crusadergames.bugwars.exceptions.ScriptDoesNotBelongToUserException;
-import net.crusadergames.bugwars.exceptions.ScriptNotFoundException;
-import net.crusadergames.bugwars.exceptions.ScriptSaveException;
-import net.crusadergames.bugwars.exceptions.UserNotFoundException;
+import net.crusadergames.bugwars.exceptions.*;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
@@ -34,13 +31,21 @@ public class ScriptService {
             if (optionalUser.isEmpty()) {
                 throw new UserNotFoundException();
             }
+            Optional<Script> optionalScript = scriptRepository.findScriptByName(scriptRequest.getScript_name());
+            if (optionalScript.isPresent()) {
+                throw new ScriptNameAlreadyExistsException();
+            }
             User user = optionalUser.get();
             LocalDate currentDate = LocalDate.now();
             Script script = new Script(null, scriptRequest.getScript_name(), scriptRequest.getScript_body(), currentDate, currentDate, user);
             scriptRepository.save(script);
             userRepository.save(user);
             return script;
-        } catch (Exception e) {
+        } catch (ScriptNameAlreadyExistsException e) {
+            throw new ScriptNameAlreadyExistsException();
+        } catch (UserNotFoundException e) {
+            throw new UserNotFoundException();
+        } catch (Exception e){
             throw new ScriptSaveException();
         }
     }
