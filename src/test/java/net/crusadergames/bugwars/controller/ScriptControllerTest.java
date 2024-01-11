@@ -52,18 +52,40 @@ public class ScriptControllerTest {
     private ScriptController scriptController;
 
     @Test
-    public void postScriptTest() throws Exception {
+    @WithMockUser
+    public void shouldCreateNewScript() throws Exception {
         ScriptRequest scriptRequest = new ScriptRequest();
-        Principal principal = () -> "username";
-       when(scriptService.createNewScript(principal, scriptRequest)).thenReturn(null);
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken("testUser", "password"));
+        scriptRequest.setScript_name("Test Script");
+        scriptRequest.setScript_body("This is a test script.");
 
+        Script script = new Script();
+        script.setScript_id(1L);
+        script.setName("Test Script");
+        script.setBody("This is a test script.");
+
+        when(scriptService.createNewScript(any(), any())).thenReturn(script);
         mockMvc.perform(post("/api/scripts")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(scriptRequest)))
-                .andExpect(status().isBadRequest());
+                        .content("{\"name\":\"Test Script\", \"content\":\"This is a test script.\"}"))
+                .andExpect(status().isCreated());
+        verify(scriptService, times(1)).createNewScript(any(), any());
     }
+
+    @Test
+    @WithMockUser
+    public void shouldReturnBadRequestWhenScriptIsNull() throws Exception {
+        ScriptRequest scriptRequest = new ScriptRequest();
+        scriptRequest.setScript_name("Test Script");
+        scriptRequest.setScript_body("This is a test script.");
+
+        when(scriptService.createNewScript(any(), any())).thenReturn(null);
+        mockMvc.perform(post("/api/scripts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Test Script\", \"content\":\"This is a test script.\"}"))
+                .andExpect(status().isBadRequest());
+        verify(scriptService, times(1)).createNewScript(any(), any());
+    }
+
 
     @Test
     @WithMockUser(username = "testUser")
@@ -90,24 +112,38 @@ public class ScriptControllerTest {
 
     @Test
     @WithMockUser
-    public void shouldUpdateScript() throws Exception {
+    public void testUpdateScript() throws Exception {
+        ScriptRequest scriptRequest = new ScriptRequest();
+        scriptRequest.setScript_name("TestKey");
+        scriptRequest.setScript_body("TestValue");
+
         Script script = new Script();
         script.setScript_id(1L);
+        script.setName("TestScript");
+
+        Long scriptId = 1L;
         when(scriptService.updateOldScript(any(), any(), any())).thenReturn(script);
-        mockMvc.perform(put("/api/scripts/1")
+
+        mockMvc.perform(put("/api/scripts/" + scriptId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"field\":\"value\"}"))
+                        .content("{\"key\":\"TestKey\", \"value\":\"TestValue\"}")) // replace with actual JSON representation of ScriptRequest
                 .andExpect(status().isCreated());
         verify(scriptService, times(1)).updateOldScript(any(), any(), any());
     }
 
     @Test
     @WithMockUser
-    public void shouldNotUpdateScriptWhenNull() throws Exception {
+    public void testUpdateScriptNull() throws Exception {
+        ScriptRequest scriptRequest = new ScriptRequest();
+        scriptRequest.setScript_name("TestKey");
+        scriptRequest.setScript_body("TestValue");
+
+        Long scriptId = 1L;
+
         when(scriptService.updateOldScript(any(), any(), any())).thenReturn(null);
-        mockMvc.perform(put("/api/scripts/1")
+        mockMvc.perform(put("/api/scripts/" + scriptId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"field\":\"value\"}"))
+                        .content("{\"key\":\"TestKey\", \"value\":\"TestValue\"}")) // replace with actual JSON representation of ScriptRequest
                 .andExpect(status().isBadRequest());
         verify(scriptService, times(1)).updateOldScript(any(), any(), any());
     }
