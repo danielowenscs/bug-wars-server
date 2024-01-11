@@ -114,19 +114,18 @@ public class ScriptControllerTest {
     @WithMockUser
     public void testUpdateScript() throws Exception {
         ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setScript_name("TestKey");
-        scriptRequest.setScript_body("TestValue");
-
+        scriptRequest.setScript_name("TestName");
+        scriptRequest.setScript_body("TestBody");
         Script script = new Script();
         script.setScript_id(1L);
         script.setName("TestScript");
 
         Long scriptId = 1L;
         when(scriptService.updateOldScript(any(), any(), any())).thenReturn(script);
-
-        mockMvc.perform(put("/api/scripts/" + scriptId)
+        String scriptRequestJson = "{\"script_name\":\"TestScript\", \"script_body\":\"This is a test script body\"}";
+        mockMvc.perform(put("/" + scriptId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"key\":\"TestKey\", \"value\":\"TestValue\"}")) // replace with actual JSON representation of ScriptRequest
+                        .content(scriptRequestJson))
                 .andExpect(status().isCreated());
         verify(scriptService, times(1)).updateOldScript(any(), any(), any());
     }
@@ -135,16 +134,17 @@ public class ScriptControllerTest {
     @WithMockUser
     public void testUpdateScriptNull() throws Exception {
         ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setScript_name("TestKey");
-        scriptRequest.setScript_body("TestValue");
+        scriptRequest.setScript_name("TestName");
+        scriptRequest.setScript_body("TestBody");
 
         Long scriptId = 1L;
-
         when(scriptService.updateOldScript(any(), any(), any())).thenReturn(null);
-        mockMvc.perform(put("/api/scripts/" + scriptId)
+        String scriptRequestJson = "{\"script_name\":\"TestScript\", \"script_body\":\"This is a test script body\"}";
+        mockMvc.perform(put("/" + scriptId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"key\":\"TestKey\", \"value\":\"TestValue\"}")) // replace with actual JSON representation of ScriptRequest
-                .andExpect(status().isBadRequest());
+                        .content(scriptRequestJson))
+                .andExpect(status().isCreated());
+
         verify(scriptService, times(1)).updateOldScript(any(), any(), any());
     }
 
