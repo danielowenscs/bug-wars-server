@@ -1,5 +1,6 @@
 package net.crusadergames.bugwars.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import net.crusadergames.bugwars.model.auth.User;
 import java.time.LocalDate;
 
@@ -35,9 +37,12 @@ public class Script {
     @NotNull
     private LocalDate date_Updated;
 
+    @ToString.Exclude
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "owner_id")
     private User user;
+
 
 
 }

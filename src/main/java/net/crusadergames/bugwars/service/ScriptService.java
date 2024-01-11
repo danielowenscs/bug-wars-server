@@ -25,7 +25,16 @@ public class ScriptService {
     @Autowired
     UserRepository userRepository;
 
+    public ScriptService(ScriptRepository scriptRepository,
+                         UserRepository userRepository){
+        this.scriptRepository = scriptRepository;
+        this.userRepository = userRepository;
+    }
+
     public Script createNewScript(Principal principal, ScriptRequest scriptRequest) {
+        if (scriptRequest.getScript_name().isEmpty() || scriptRequest.getScript_body().isEmpty()) {
+            throw new ScriptSaveException();
+        }
         try {
             Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
             if (optionalUser.isEmpty()) {
@@ -37,8 +46,9 @@ public class ScriptService {
             }
             User user = optionalUser.get();
             LocalDate currentDate = LocalDate.now();
-            Script script = new Script(null, scriptRequest.getScript_name(), scriptRequest.getScript_body(), currentDate, currentDate, user);
-            scriptRepository.save(script);
+            Script script = new Script(null,scriptRequest.getScript_name(), scriptRequest.getScript_body(), currentDate,
+                    currentDate, user);
+            script = scriptRepository.save(script);
             userRepository.save(user);
             return script;
         } catch (ScriptNameAlreadyExistsException e) {

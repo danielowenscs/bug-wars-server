@@ -86,7 +86,6 @@ public class ScriptControllerTest {
         verify(scriptService, times(1)).createNewScript(any(), any());
     }
 
-
     @Test
     @WithMockUser(username = "testUser")
     public void deleteScriptTest() {
