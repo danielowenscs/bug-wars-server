@@ -32,7 +32,7 @@ public class ScriptService {
     }
 
     public Script createNewScript(Principal principal, ScriptRequest scriptRequest) {
-        if (scriptRequest.getScript_name().isEmpty() || scriptRequest.getScript_body().isEmpty()) {
+        if (scriptRequest.getName().isEmpty() || scriptRequest.getBody().isEmpty()) {
             throw new ScriptSaveException();
         }
         try {
@@ -40,13 +40,13 @@ public class ScriptService {
             if (optionalUser.isEmpty()) {
                 throw new UserNotFoundException();
             }
-            Optional<Script> optionalScript = scriptRepository.findScriptByName(scriptRequest.getScript_name());
+            Optional<Script> optionalScript = scriptRepository.findScriptByName(scriptRequest.getName());
             if (optionalScript.isPresent()) {
                 throw new ScriptNameAlreadyExistsException();
             }
             User user = optionalUser.get();
             LocalDate currentDate = LocalDate.now();
-            Script script = new Script(null,scriptRequest.getScript_name(), scriptRequest.getScript_body(), currentDate,
+            Script script = new Script(null,scriptRequest.getName(), scriptRequest.getBody(), currentDate,
                     currentDate, user);
             script = scriptRepository.save(script);
             userRepository.save(user);
@@ -117,7 +117,8 @@ public class ScriptService {
             }
 
             LocalDate currentDate = LocalDate.now();
-            Script newScript = new Script(scriptId, scriptRequest.getScript_name(), scriptRequest.getScript_body(), oldScript.getDate_created(), currentDate, currentUser);
+            Script newScript = new Script(scriptId, scriptRequest.getName(), scriptRequest.getBody(),
+                    oldScript.getDateCreated(), currentDate, currentUser);
             scriptRepository.save(newScript);
             userRepository.save(currentUser);
             return newScript;

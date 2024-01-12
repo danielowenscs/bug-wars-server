@@ -32,7 +32,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+
 @AutoConfigureMockMvc
 public class ScriptControllerTest {
 
@@ -55,11 +55,11 @@ public class ScriptControllerTest {
     @WithMockUser
     public void shouldCreateNewScript() throws Exception {
         ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setScript_name("Test Script");
-        scriptRequest.setScript_body("This is a test script.");
+        scriptRequest.setName("Test Script");
+        scriptRequest.setBody("This is a test script.");
 
         Script script = new Script();
-        script.setScript_id(1L);
+        script.setScriptId(1L);
         script.setName("Test Script");
         script.setBody("This is a test script.");
 
@@ -75,8 +75,8 @@ public class ScriptControllerTest {
     @WithMockUser
     public void shouldReturnBadRequestWhenScriptIsNull() throws Exception {
         ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setScript_name("Test Script");
-        scriptRequest.setScript_body("This is a test script.");
+        scriptRequest.setName("Test Script");
+        scriptRequest.setBody("This is a test script.");
 
         when(scriptService.createNewScript(any(), any())).thenReturn(null);
         mockMvc.perform(post("/api/scripts")
@@ -112,16 +112,16 @@ public class ScriptControllerTest {
     @Test
     @WithMockUser
     public void testUpdateScript() throws Exception {
-        ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setScript_name("TestName");
-        scriptRequest.setScript_body("TestBody");
+        ScriptRequest scriptRequest = new ScriptRequest("testName","TstBody");
+        scriptRequest.setName("TestName");
+        scriptRequest.setBody("TestBody");
         Script script = new Script();
-        script.setScript_id(1L);
+        script.setScriptId(1L);
         script.setName("TestScript");
 
         Long scriptId = 1L;
         when(scriptService.updateOldScript(any(), any(), any())).thenReturn(script);
-        String scriptRequestJson = "{\"script_name\":\"TestScript\", \"script_body\":\"This is a test script body\"}";
+        String scriptRequestJson = "{\"name\":\"TestScript\", \"body\":\"This is a test script body\"}";
         mockMvc.perform(put("/" + scriptId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(scriptRequestJson))
@@ -133,12 +133,12 @@ public class ScriptControllerTest {
     @WithMockUser
     public void testUpdateScriptNull() throws Exception {
         ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setScript_name("TestName");
-        scriptRequest.setScript_body("TestBody");
+        scriptRequest.setName("TestName");
+        scriptRequest.setBody("TestBody");
 
         Long scriptId = 1L;
         when(scriptService.updateOldScript(any(), any(), any())).thenReturn(null);
-        String scriptRequestJson = "{\"script_name\":\"TestScript\", \"script_body\":\"This is a test script body\"}";
+        String scriptRequestJson = "{\"name\":\"TestScript\", \"body\":\"This is a test script body\"}";
         mockMvc.perform(put("/" + scriptId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(scriptRequestJson))

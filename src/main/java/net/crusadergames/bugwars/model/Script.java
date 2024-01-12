@@ -22,7 +22,8 @@ public class Script {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long script_id;
+    @Column(name = "script_id")
+    private Long scriptId;
 
     @NotBlank
     @Size(max = 25)
@@ -32,10 +33,12 @@ public class Script {
     private String body;
 
     @NotNull
-    private LocalDate date_created;
+    @Column(name = "date_created")
+    private LocalDate dateCreated;
 
     @NotNull
-    private LocalDate date_Updated;
+    @Column(name = "date_updated")
+    private LocalDate dateUpdated;
 
     @ToString.Exclude
     @ManyToOne

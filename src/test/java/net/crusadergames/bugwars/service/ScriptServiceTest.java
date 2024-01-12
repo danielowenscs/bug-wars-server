@@ -54,8 +54,8 @@ public class ScriptServiceTest {
     @Test
     public void createNewScript_shouldReturnCreatedScript()  {
         //ARRANGE
-        Script expectedScript = new Script(1L, "First Script",
-                "I am a script", LocalDate.now(),LocalDate.now(),USER);
+//        Script expectedScript = new Script(1L, "First Script",
+//                "I am a script", LocalDate.now(),LocalDate.now(),USER);
         ScriptRequest request = new ScriptRequest("First Script", "I am a Script");
         when(userRepository.findByUsername(any())).thenReturn(Optional.ofNullable(USER));
         when(scriptRepository.findScriptByName(any())).thenReturn(Optional.empty());
@@ -66,8 +66,8 @@ public class ScriptServiceTest {
 
         // ASSERT
         Assert.assertNotNull (createdScript);
-        Assert.assertEquals(createdScript.getScript_id(),expectedScript.getScript_id());
-        Assert.assertEquals(createdScript,expectedScript);
+        Assert.assertEquals(createdScript.getScriptId(),SCRIPT_1.getScriptId());
+        Assert.assertEquals(createdScript,SCRIPT_1);
     }
     @Test
     public void createNewScript_shouldReturnScriptNameExistsExceptionWhenRelevant()  {
