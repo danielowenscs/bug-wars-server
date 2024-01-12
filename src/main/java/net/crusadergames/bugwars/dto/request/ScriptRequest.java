@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 public class ScriptRequest {
 
     @Size(max = 25)
-    private String script_name;
+    private String name;
 
-    private String script_body;
+    private String body;
 
 }

@@ -25,20 +25,30 @@ public class ScriptService {
     @Autowired
     UserRepository userRepository;
 
+    public ScriptService(ScriptRepository scriptRepository,
+                         UserRepository userRepository){
+        this.scriptRepository = scriptRepository;
+        this.userRepository = userRepository;
+    }
+
     public Script createNewScript(Principal principal, ScriptRequest scriptRequest) {
+        if (scriptRequest.getName().isBlank() || scriptRequest.getBody().isBlank()) {
+            throw new ScriptSaveException();
+        }
         try {
             Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
             if (optionalUser.isEmpty()) {
                 throw new UserNotFoundException();
             }
-            Optional<Script> optionalScript = scriptRepository.findScriptByName(scriptRequest.getScript_name());
+            Optional<Script> optionalScript = scriptRepository.findScriptByName(scriptRequest.getName());
             if (optionalScript.isPresent()) {
                 throw new ScriptNameAlreadyExistsException();
             }
             User user = optionalUser.get();
             LocalDate currentDate = LocalDate.now();
-            Script script = new Script(null, scriptRequest.getScript_name(), scriptRequest.getScript_body(), currentDate, currentDate, user);
-            scriptRepository.save(script);
+            Script script = new Script(null,scriptRequest.getName(), scriptRequest.getBody(), currentDate,
+                    currentDate, user);
+            script = scriptRepository.save(script);
             userRepository.save(user);
             return script;
         } catch (ScriptNameAlreadyExistsException e) {
@@ -107,7 +117,8 @@ public class ScriptService {
             }
 
             LocalDate currentDate = LocalDate.now();
-            Script newScript = new Script(scriptId, scriptRequest.getScript_name(), scriptRequest.getScript_body(), oldScript.getDate_created(), currentDate, currentUser);
+            Script newScript = new Script(scriptId, scriptRequest.getName(), scriptRequest.getBody(),
+                    oldScript.getDateCreated(), currentDate, currentUser);
             scriptRepository.save(newScript);
             userRepository.save(currentUser);
             return newScript;

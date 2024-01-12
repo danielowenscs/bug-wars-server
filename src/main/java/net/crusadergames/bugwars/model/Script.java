@@ -1,5 +1,6 @@
 package net.crusadergames.bugwars.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import net.crusadergames.bugwars.model.auth.User;
 import java.time.LocalDate;
 
@@ -20,7 +22,8 @@ public class Script {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long script_id;
+    @Column(name = "script_id")
+    private Long scriptId;
 
     @NotBlank
     @Size(max = 25)
@@ -30,14 +33,19 @@ public class Script {
     private String body;
 
     @NotNull
-    private LocalDate date_created;
+    @Column(name = "date_created")
+    private LocalDate dateCreated;
 
     @NotNull
-    private LocalDate date_Updated;
+    @Column(name = "date_updated")
+    private LocalDate dateUpdated;
 
+    @ToString.Exclude
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "owner_id")
     private User user;
+
 
 
 }
