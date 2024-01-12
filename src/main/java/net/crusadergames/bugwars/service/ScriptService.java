@@ -32,7 +32,7 @@ public class ScriptService {
     }
 
     public Script createNewScript(Principal principal, ScriptRequest scriptRequest) {
-        if (scriptRequest.getName().isEmpty() || scriptRequest.getBody().isEmpty()) {
+        if (scriptRequest.getName().isBlank() || scriptRequest.getBody().isBlank()) {
             throw new ScriptSaveException();
         }
         try {
