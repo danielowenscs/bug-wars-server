@@ -28,6 +28,7 @@ public class ScriptController {
     @Autowired
     ScriptRepository scriptRepository;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping()
     public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptRequest, Principal principal) {
         Script script = scriptService.createNewScript(principal, scriptRequest);
