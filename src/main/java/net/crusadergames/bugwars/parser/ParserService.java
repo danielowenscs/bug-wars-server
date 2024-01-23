@@ -5,6 +5,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+// Technically need to be under Service
+// OR
+// Convert to a ParserUtil
 @Service
 public class ParserService {
 
