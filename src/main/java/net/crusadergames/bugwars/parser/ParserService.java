@@ -87,6 +87,7 @@ public class ParserService {
     }
 
     private final static class ScriptSyntax {
+        // Can be a Constants
         public static final int MIN_EXPRESSIONS = 1;
         public static final int MAX_EXPRESSIONS = 2;
         public static final int MIN_BRANCH_CODE = 30;
@@ -104,7 +105,9 @@ public class ParserService {
             put("ifWall", 34);
             put("goto", 35);
         }};
+        // ^
 
+        // Move to Tokenizer...or Util
         public static Boolean isValidKeyword(String keyword) {
             return keywordMap.containsKey(keyword);
         }
@@ -162,7 +165,7 @@ public class ParserService {
 
             return keywords;
         }
-
+        // ^
     }
 
 }
