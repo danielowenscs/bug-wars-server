@@ -51,7 +51,7 @@ public class ScriptController {
     }
 
     @GetMapping()
-    public List<Script> getAllScripts(Principal principal){
+    public List<Script> getAllScriptsByUser(Principal principal){
         return scriptService.getAllScriptsByUser(principal);
     }
 

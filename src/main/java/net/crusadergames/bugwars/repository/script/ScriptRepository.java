@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface ScriptRepository extends JpaRepository<Script,Long> {
-    List<Script> getScriptsByUser(User user);
-    List<Script> findScriptsByName(User user);
+    List<Script> findScriptsByUser(User user);
     Optional<Script> findScriptByName(String name);
 }

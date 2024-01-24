@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -246,7 +245,7 @@ public class ScriptServiceTest {
         expected.add(script1);
         expected.add(script2);
         when(userRepository.findByUsername(any())).thenReturn(Optional.ofNullable(USER_NEW));
-        when(scriptRepository.findScriptsByName(any())).thenReturn(expected);
+        when(scriptRepository.findScriptsByUser(any())).thenReturn(expected);
 
         ScriptRequest requestUno = new ScriptRequest("Script 1", "Script 1");
         scriptService.createNewScript(mockPrincipal, requestUno);

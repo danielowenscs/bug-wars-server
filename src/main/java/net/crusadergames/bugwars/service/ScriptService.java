@@ -7,8 +7,6 @@ import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.repository.script.ScriptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -35,7 +33,7 @@ public class ScriptService {
         if (scriptRequest.getName().isBlank() || scriptRequest.getBody().isBlank()) {
             throw new ScriptSaveException();
         }
-        // Why are we saving the user?
+
         Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
         if (optionalUser.isEmpty()) {
             throw new UserNotFoundException();
@@ -44,11 +42,13 @@ public class ScriptService {
         if (optionalScript.isPresent()) {
             throw new ScriptNameAlreadyExistsException();
         }
+
         User user = optionalUser.get();
         LocalDate currentDate = LocalDate.now();
         Script script = new Script(null,scriptRequest.getName(), scriptRequest.getBody(), currentDate,
                 currentDate, user);
         script = scriptRepository.save(script);
+
         return script;
     }
 
@@ -124,7 +124,6 @@ public class ScriptService {
             throw new UserNotFoundException();
         }
         User user = optionalUser.get();
-        System.out.println(user);
-        return scriptRepository.findScriptsByName(user);
+        return scriptRepository.findScriptsByUser(user);
     }
 }
