@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.controller;
 
 import net.crusadergames.bugwars.dto.request.ScriptRequest;
+import net.crusadergames.bugwars.exceptions.ScriptNotFoundException;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import net.crusadergames.bugwars.repository.script.ScriptRepository;
@@ -19,14 +20,9 @@ import java.util.List;
 @RequestMapping("/api/scripts")
 @PreAuthorize("isAuthenticated()")
 public class ScriptController {
+
     @Autowired
     ScriptService scriptService;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    ScriptRepository scriptRepository;
 
     @PostMapping()
     public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptRequest, Principal principal) {
@@ -38,17 +34,24 @@ public class ScriptController {
     }
 
     @DeleteMapping("/{scriptId}")
-    public void deleteScript(@PathVariable Long scriptId, Principal principal){
+    public ResponseEntity<String> deleteScript(@PathVariable Long scriptId, Principal principal){
         scriptService.deleteScriptById(scriptId, principal);
+
+        return new ResponseEntity<>("Script deleted", HttpStatus.OK);
     }
 
     @GetMapping("/{scriptId}")
-    public ResponseEntity<Script> getScript(@PathVariable Long scriptId, Principal principal) {
-        return scriptService.getScript(scriptId, principal);
+    public ResponseEntity<Script> getUserScript(@PathVariable Long scriptId, Principal principal) {
+        Script script = scriptService.getScript(scriptId, principal);
+        if(script == null){
+            return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(script, HttpStatus.OK);
     }
 
     @GetMapping()
-    public List<Script> getUserScripts(Principal principal){
+    public List<Script> getAllScripts(Principal principal){
         return scriptService.getAllScriptsByUser(principal);
     }
 
