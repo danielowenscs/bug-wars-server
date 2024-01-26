@@ -52,7 +52,7 @@ public class ScriptService {
         return script;
     }
 
-    public void deleteScriptById(Long scriptId, Principal principal) {
+    public String deleteScriptById(Long scriptId, Principal principal) {
         Optional<Script> optionalScript = scriptRepository.findById(scriptId);
         Optional<User> user = userRepository.findByUsername(principal.getName());
         if (optionalScript.isEmpty()) {
@@ -69,6 +69,7 @@ public class ScriptService {
         }
 
         scriptRepository.deleteById(scriptId);
+        return "Script Deleted";
     }
 
     public Script getScript(Long scriptId, Principal principal) {

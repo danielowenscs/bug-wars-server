@@ -244,20 +244,13 @@ public class ScriptServiceTest {
         List<Script> expected = new ArrayList<>();
         expected.add(script1);
         expected.add(script2);
-        when(userRepository.findByUsername(any())).thenReturn(Optional.ofNullable(USER_NEW));
-        when(scriptRepository.findScriptsByUser(any())).thenReturn(expected);
-
-        ScriptRequest requestUno = new ScriptRequest("Script 1", "Script 1");
-        scriptService.createNewScript(mockPrincipal, requestUno);
-
-        ScriptRequest requestDos = new ScriptRequest("Script 2", "Script 2");
-        scriptService.createNewScript(mockPrincipal, requestDos);
+        when(mockPrincipal.getName()).thenReturn("andrew");
+        when(userRepository.findByUsername("andrew")).thenReturn(Optional.of(USER_NEW));
+        when(scriptRepository.findScriptsByUser(USER_NEW)).thenReturn(expected);
 
         List<Script> script = scriptService.getAllScriptsByUser(mockPrincipal);
 
-        Assert.assertNotNull (script);
         Assert.assertEquals(expected, script);
-
     }
 
     @Test

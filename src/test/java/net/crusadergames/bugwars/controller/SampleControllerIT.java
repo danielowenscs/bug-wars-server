@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.crusadergames.bugwars.controller.SampleStringController;
 import net.crusadergames.bugwars.model.SampleString;
 import net.crusadergames.bugwars.service.SampleStringService;
 import org.hamcrest.CoreMatchers;
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = SampleStringController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
-public class SampleControllerTests {
+public class SampleControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
