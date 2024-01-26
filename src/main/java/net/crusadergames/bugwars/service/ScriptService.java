@@ -14,6 +14,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static net.crusadergames.bugwars.Util.Constants.RESPONSE_SCRIPTDELETED;
+
 @Service
 public class ScriptService {
 
@@ -23,8 +25,7 @@ public class ScriptService {
     @Autowired
     UserRepository userRepository;
 
-    public ScriptService(ScriptRepository scriptRepository,
-                         UserRepository userRepository){
+    public ScriptService(ScriptRepository scriptRepository, UserRepository userRepository){
         this.scriptRepository = scriptRepository;
         this.userRepository = userRepository;
     }
@@ -35,18 +36,16 @@ public class ScriptService {
         }
 
         Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
-        if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException();
-        }
+        throwUserNotFound(optionalUser);
+
         Optional<Script> optionalScript = scriptRepository.findScriptByName(scriptRequest.getName());
         if (optionalScript.isPresent()) {
             throw new ScriptNameAlreadyExistsException();
         }
 
         User user = optionalUser.get();
-        LocalDate currentDate = LocalDate.now();
-        Script script = new Script(null,scriptRequest.getName(), scriptRequest.getBody(), currentDate,
-                currentDate, user);
+        Script script = new Script(null,scriptRequest.getName(), scriptRequest.getBody(), LocalDate.now(), LocalDate.now(), user);
+
         script = scriptRepository.save(script);
 
         return script;
@@ -55,79 +54,80 @@ public class ScriptService {
     public String deleteScriptById(Long scriptId, Principal principal) {
         Optional<Script> optionalScript = scriptRepository.findById(scriptId);
         Optional<User> user = userRepository.findByUsername(principal.getName());
-        if (optionalScript.isEmpty()) {
-            throw new ScriptNotFoundException();
-        }
-        if (user.isEmpty()) {
-            throw new UserNotFoundException();
-        }
 
-        Script script = optionalScript.get();
+        throwScriptNotPresent(optionalScript);
+        throwUserNotFound(user);
+
+        User scriptUser = optionalScript.get().getUser();
         User currentUser = user.get();
-        if (!currentUser.getId().equals(script.getUser().getId())) {
-            throw new ScriptDoesNotBelongToUserException();
-        }
+
+        throwScriptDoesNotBelongToUser(currentUser, scriptUser);
 
         scriptRepository.deleteById(scriptId);
-        return "Script Deleted";
+        return RESPONSE_SCRIPTDELETED;
     }
 
     public Script getScript(Long scriptId, Principal principal) {
         Optional<User> userOptional = userRepository.findByUsername(principal.getName());
         Optional<Script> scriptOptional = scriptRepository.findById(scriptId);
 
-        if (userOptional.isEmpty()) {
-            throw new UserNotFoundException();
-        }
-
-        User user = userOptional.get();
-        if (scriptOptional.isEmpty()) {
-            throw new ScriptNotFoundException();
-        }
+        throwUserNotFound(userOptional);
+        throwScriptNotPresent(scriptOptional);
 
         Script script = scriptOptional.get();
-        if (!user.getId().equals(script.getUser().getId())) {
-            throw new ScriptDoesNotBelongToUserException();
-        }
+
+        User currentUser = userOptional.get();
+        User scriptUser = script.getUser();
+
+        throwScriptDoesNotBelongToUser(currentUser, scriptUser);
+
         return script;
     }
 
     public Script updateOldScript(Principal principal, ScriptRequest scriptRequest, Long scriptId) {
-        System.out.println("Initiated Updating Old Script"); // Meaningful log
         Optional<Script> optionalScript = scriptRepository.findById(scriptId);
         Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
-        if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException();
-        }
-        if (optionalScript.isEmpty()) {
-            throw new ScriptNotFoundException();
-        }
+
+        throwUserNotFound(optionalUser);
+        throwScriptNotPresent(optionalScript);
 
         Script oldScript = optionalScript.get();
-        System.out.println("1------------"); // NonMeaningful log
-        System.out.println(oldScript); // NonMeaningful log
         User currentUser = optionalUser.get();
+        User scriptUser = optionalScript.get().getUser();
 
-        Script script = optionalScript.get();
-        if (!currentUser.getId().equals(script.getUser().getId())) {
-            throw new ScriptDoesNotBelongToUserException();
-        }
+        throwScriptDoesNotBelongToUser(currentUser, scriptUser);
 
         LocalDate currentDate = LocalDate.now();
-        Script newScript = new Script(scriptId, scriptRequest.getName(), scriptRequest.getBody(),
-                oldScript.getDateCreated(), currentDate, currentUser);
+        Script newScript = new Script(scriptId, scriptRequest.getName(), scriptRequest.getBody(), oldScript.getDateCreated(), currentDate, currentUser);
         scriptRepository.save(newScript);
-        System.out.println("New Script Updated: " + newScript); // Meaningful log
+
         return newScript;
     }
 
     public List<Script> getAllScriptsByUser(Principal principal) {
         Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
 
-        if (optionalUser.isEmpty()) {
-            throw new UserNotFoundException();
-        }
+        throwUserNotFound(optionalUser);
+
         User user = optionalUser.get();
         return scriptRepository.findScriptsByUser(user);
+    }
+
+    private void throwUserNotFound(Optional<User> user) {
+        if (user.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+    }
+
+    private void throwScriptNotPresent(Optional<Script> script) {
+        if (script.isEmpty()) {
+            throw new ScriptNotFoundException();
+        }
+    }
+
+    private void throwScriptDoesNotBelongToUser(User currentUser, User scriptUser) {
+        if (!currentUser.getId().equals(scriptUser.getId())) {
+            throw new ScriptDoesNotBelongToUserException();
+        }
     }
 }
