@@ -93,6 +93,7 @@ public class ScriptService {
     }
 
     public Script updateOldScript(Principal principal, ScriptRequest scriptRequest, Long scriptId) {
+        System.out.println("Initiated Updating Old Script"); // Meaningful log
         Optional<Script> optionalScript = scriptRepository.findById(scriptId);
         Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
         if (optionalUser.isEmpty()) {
@@ -103,6 +104,8 @@ public class ScriptService {
         }
 
         Script oldScript = optionalScript.get();
+        System.out.println("1------------"); // NonMeaningful log
+        System.out.println(oldScript); // NonMeaningful log
         User currentUser = optionalUser.get();
 
         Script script = optionalScript.get();
@@ -114,7 +117,7 @@ public class ScriptService {
         Script newScript = new Script(scriptId, scriptRequest.getName(), scriptRequest.getBody(),
                 oldScript.getDateCreated(), currentDate, currentUser);
         scriptRepository.save(newScript);
-
+        System.out.println("New Script Updated: " + newScript); // Meaningful log
         return newScript;
     }
 
