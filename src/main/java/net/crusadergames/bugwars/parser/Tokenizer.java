@@ -9,58 +9,49 @@ import java.util.List;
 @Service
 public class Tokenizer {
 
-    private List<Token> tokens;
+    public static List<String> tokens;
     private String scriptBody;
 
+    public static void main(String[] args) {
+        String testScript = "    :START  att\n" +
+                "        att\n" +
+                "      att\n" +
+                "      GOTO EAT\n" +
+                "        att\n" +
+                "        att\n" +
+                "        att\n" +
+                "        att\n" +
+                "    :EAT  eat\n" +
+                "      GOTO START\n" +
+                "     mov\n";
+         new Tokenizer(testScript);
+         Parser parser = new Parser();
+        System.out.println(parser.parseTokens(tokens));
+    }
 
     public Tokenizer(String scriptBody) {
-        String testScript = "    :START  attack\n" +
-                "     moveForward\n" +
-                "    GOTO DOBBY\n" +
-                ":DOBBY  eat \n";
-        this.scriptBody = testScript;
+        tokens = new ArrayList<>();
+        this.scriptBody = scriptBody;
         tokenize();
     }
 
-    private List<Token> tokenize() {
+    private List<String> tokenize() {
         List<String> lines = new ArrayList<String>(Arrays.asList(scriptBody.split("\\n")));
         // returns list of Tokens
         for (String line : lines) {
 
             if (line == null || line.trim().equals("") || line.trim().startsWith("#")) {
-                row++;
                 continue;
             }
 
-            if (line.contains("#")){
-                Integer hashIndex = line.indexOf("#");
-                line = line.substring(0, hashIndex);
-            }
+            line = trimComment(line);
 
-            String[] tokens = line.trim().split("\\s+");
-            LineOfTokens temp = new LineOfTokens(row, Arrays.asList(tokens));
-            result.add(temp);
-
+            String[] lineTokens = line.trim().split("\\s+");
+            tokens.addAll(Arrays.asList(lineTokens));
         }
 
         return tokens;
     }
-
-    public List<Token> tokenizeLine(String line) {
-        List<Token> lineTokens = new ArrayList<>();
-        String tokenValue;
-
-        for (int i = 0; i < line.length(); i++) {
-            char currentChar = line.charAt(i);
-
-            if (currentChar == ':') {
-                lineTokens.add(new Token(TokenTypes.COLON, ":"));
-            }
-
-            line = trimComment(line);
-        }
-    }
-
 
     public static String trimComment(String line) {
         if (line.contains("#")) {

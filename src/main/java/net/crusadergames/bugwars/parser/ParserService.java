@@ -11,14 +11,14 @@ import java.util.*;
 @Service
 public class ParserService {
 
-    public static void main(String[] args) {
-        String script = "    :START  attack\n" +
-                "     moveForward\n" +
-                "    GOTO DOBBY\n" +
-                ":DOBBY  eat \n";
-        validateScript(script);
+
+    public static boolean validateScript(String scriptBody){
+        List<String> lines = new ArrayList<String>(Arrays.asList(scriptBody.split("\\n")));
+        return true;
     }
 
+
+    /*
     public static boolean validateScript(String scriptBody) {
 
 
@@ -135,14 +135,7 @@ public class ParserService {
         }
 
         public static String[] parseKeyword(String keyword) {
-            /*
-            :LAME goto LAME
-                mov START
-                ifFood EAT
-                att
-                ifWall
 
-             */
             String[] keywords = keyword.split(" ");
             if(keywords.length < ScriptSyntax.MIN_EXPRESSIONS || keywords.length > ScriptSyntax.MAX_EXPRESSIONS) {
                 return null;
@@ -170,5 +163,5 @@ public class ParserService {
         }
         // ^
     }
-
+ */
 }
