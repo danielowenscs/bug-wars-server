@@ -26,7 +26,7 @@ public class ScriptService {
     UserRepository userRepository;
 
     public ScriptService(ScriptRepository scriptRepository,
-                         UserRepository userRepository){
+                         UserRepository userRepository) {
         this.scriptRepository = scriptRepository;
         this.userRepository = userRepository;
     }
@@ -35,42 +35,36 @@ public class ScriptService {
         if (scriptRequest.getName().isBlank() || scriptRequest.getBody().isBlank()) {
             throw new ScriptSaveException();
         }
-        try {
-            Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
-            if (optionalUser.isEmpty()) {
-                throw new UserNotFoundException();
-            }
-            Optional<Script> optionalScript = scriptRepository.findScriptByName(scriptRequest.getName());
-            if (optionalScript.isPresent()) {
-                throw new ScriptNameAlreadyExistsException();
-            }
-            User user = optionalUser.get();
-            LocalDate currentDate = LocalDate.now();
-            Script script = new Script(null,scriptRequest.getName(), scriptRequest.getBody(), currentDate,
-                    currentDate, user);
-            script = scriptRepository.save(script);
-            userRepository.save(user);
-            return script;
-        } catch (ScriptNameAlreadyExistsException e) {
-            throw new ScriptNameAlreadyExistsException();
-        } catch (UserNotFoundException e) {
+        Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
+        if (optionalUser.isEmpty()) {
             throw new UserNotFoundException();
-        } catch (Exception e){
-            throw new ScriptSaveException();
         }
+        Optional<Script> optionalScript = scriptRepository.findScriptByName(scriptRequest.getName());
+        if (optionalScript.isPresent()) {
+            throw new ScriptNameAlreadyExistsException();
+        }
+        User user = optionalUser.get();
+        LocalDate currentDate = LocalDate.now();
+        Script script = new Script(null, scriptRequest.getName().toLowerCase(), scriptRequest.getBody(), currentDate,
+                currentDate, user);
+        script = scriptRepository.save(script);
+        userRepository.save(user);
+        return script;
     }
 
     public ResponseEntity<?> deleteScriptById(Long scriptId, Principal principal) {
+        Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
         Optional<Script> optionalScript = scriptRepository.findById(scriptId);
-        Optional<User> user = userRepository.findByUsername(principal.getName());
         if (optionalScript.isEmpty()) {
             throw new ScriptNotFoundException();
         }
-        if (user.isEmpty()) {
-            throw new UserNotFoundException();
-        }
+
         Script script = optionalScript.get();
-        User currentUser = user.get();
+        User currentUser = optionalUser.get();
         if (!currentUser.getId().equals(script.getUser().getId())) {
             throw new ScriptDoesNotBelongToUserException();
         }
@@ -81,13 +75,12 @@ public class ScriptService {
 
     public ResponseEntity<Script> getScript(Long scriptId, Principal principal) {
         Optional<User> userOptional = userRepository.findByUsername(principal.getName());
-        Optional<Script> scriptOptional = scriptRepository.findById(scriptId);
-
         if (userOptional.isEmpty()) {
             throw new UserNotFoundException();
         }
 
         User user = userOptional.get();
+        Optional<Script> scriptOptional = scriptRepository.findById(scriptId);
         if (scriptOptional.isEmpty()) {
             throw new ScriptNotFoundException();
         }
@@ -100,32 +93,33 @@ public class ScriptService {
     }
 
     public Script updateOldScript(Principal principal, ScriptRequest scriptRequest, Long scriptId) {
-        try {
-            Optional<Script> optionalScript = scriptRepository.findById(scriptId);
-            Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
-            if (optionalUser.isEmpty()) {
-                throw new UserNotFoundException();
-            }
-            if (optionalScript.isEmpty()) {
-                throw new ScriptNotFoundException();
-            }
-
-            Script oldScript = optionalScript.get();
-            User currentUser = optionalUser.get();
-            if (!currentUser.getScripts().contains(oldScript)) {
-                throw new ScriptDoesNotBelongToUserException();
-            }
-
-            LocalDate currentDate = LocalDate.now();
-            Script newScript = new Script(scriptId, scriptRequest.getName(), scriptRequest.getBody(),
-                    oldScript.getDateCreated(), currentDate, currentUser);
-            scriptRepository.save(newScript);
-            userRepository.save(currentUser);
-            return newScript;
-        } catch (Exception e) {
-            throw new ScriptSaveException();
+        Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException();
         }
 
+        Optional<Script> optionalScript = scriptRepository.findById(scriptId);
+        if (optionalScript.isEmpty()) {
+            throw new ScriptNotFoundException();
+        }
+
+        Optional<Script> testScriptNameOptional = scriptRepository.findScriptByName(scriptRequest.getName());
+        if(testScriptNameOptional.isPresent() && !(testScriptNameOptional.get().getScriptId().equals(optionalScript.get().getScriptId()))){
+            throw new ScriptNameAlreadyExistsException();
+        }
+
+        Script oldScript = optionalScript.get();
+        User currentUser = optionalUser.get();
+        if (!currentUser.getScripts().contains(oldScript)) {
+            throw new ScriptDoesNotBelongToUserException();
+        }
+
+        LocalDate currentDate = LocalDate.now();
+        Script newScript = new Script(scriptId, scriptRequest.getName().toLowerCase(), scriptRequest.getBody(),
+                oldScript.getDateCreated(), currentDate, currentUser);
+        scriptRepository.save(newScript);
+        userRepository.save(currentUser);
+        return newScript;
     }
 
     public List<Script> getAllScriptsByUser(Principal principal) {
