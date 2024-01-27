@@ -47,7 +47,7 @@ public class AuthService {
 
         if(signUpRequest.getUsername().matches(".*\\s.*") || signUpRequest.getEmail().matches(".*\\s.*") ||
                 signUpRequest.getPassword().matches(".*\\s.*")){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "No spaces allowed in any field");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No spaces allowed in any field");
         }
 
         if (userRepository.existsByUsernameIgnoreCase(signUpRequest.getUsername())) {
