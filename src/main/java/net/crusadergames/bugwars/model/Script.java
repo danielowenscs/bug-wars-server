@@ -30,6 +30,7 @@ public class Script {
     private String name;
 
     @NotBlank
+    @Column(columnDefinition = "TEXT")
     private String body;
 
     @NotNull
