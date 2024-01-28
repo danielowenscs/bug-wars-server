@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class GameMap {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotBlank

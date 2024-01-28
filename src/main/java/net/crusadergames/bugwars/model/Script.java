@@ -21,7 +21,7 @@ import java.time.LocalDate;
 public class Script {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "script_id")
     private Long scriptId;
 
