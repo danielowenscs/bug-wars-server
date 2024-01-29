@@ -1,162 +1,107 @@
 package net.crusadergames.bugwars.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import net.crusadergames.bugwars.controller.ScriptController;
 import net.crusadergames.bugwars.dto.request.ScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
+import net.crusadergames.bugwars.repository.script.ScriptRepository;
 import net.crusadergames.bugwars.service.ScriptService;
+import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-
-@AutoConfigureMockMvc
 public class ScriptControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final User USER = new User(1L,"jeff", "gmail@email.com", "passing");
+    private final User USER_2 = new User(2L,"mac", "gmail@email.com", "passing");
+    private final User USER_NEW = new User(1L, "andrew", "gmail@email.com", "passing");
+    private final User USER_FAKE = new User();
 
-    @MockBean
+    private final Script SCRIPT_1 = new Script(1L,"First Script", "I am a script", LocalDate.now(),LocalDate.now(), USER);
+    private final Script SCRIPT_2 = new Script(2L,"Second Script", "Eat chicken", LocalDate.now(),LocalDate.now(), USER_2);
+    private final Script SCRIPT_Uno = new Script(1L, "Old Script", "Old Food!", LocalDate.now(),LocalDate.now(), USER_NEW);
+    private final Script SCRIPT_Dos = new Script(1L, "andrew", "Updated Script", LocalDate.now(),LocalDate.now(), USER_NEW);
+
+
     private ScriptService scriptService;
-
-    @MockBean
-    private UserRepository userRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private ScriptController scriptController;
+    private Principal mockPrincipal;
 
-    @Test
-    @WithMockUser
-    public void shouldCreateNewScript() throws Exception {
-        ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setName("Test Script");
-        scriptRequest.setBody("This is a test script.");
-
-        Script script = new Script();
-        script.setScriptId(1L);
-        script.setName("Test Script");
-        script.setBody("This is a test script.");
-
-        when(scriptService.createNewScript(any(), any())).thenReturn(script);
-        mockMvc.perform(post("/api/scripts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Test Script\", \"content\":\"This is a test script.\"}"))
-                .andExpect(status().isCreated());
-        verify(scriptService, times(1)).createNewScript(any(), any());
+    @BeforeEach
+    public void beforeEachTest(){
+        mockPrincipal = Mockito.mock(Principal.class);
+        scriptService = Mockito.mock(ScriptService.class);
+        scriptController = new ScriptController(scriptService);
     }
 
     @Test
-    @WithMockUser
-    public void shouldReturnBadRequestWhenScriptIsNull() throws Exception {
-        ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setName("Test Script");
-        scriptRequest.setBody("This is a test script.");
+    public void postScripts_shouldReturnCreatedScript() {
+        ScriptRequest request = new ScriptRequest("First Script", "I am a Script");
+        when(scriptService.createNewScript(mockPrincipal, request)).thenReturn(SCRIPT_1);
 
-        when(scriptService.createNewScript(any(), any())).thenReturn(null);
-        mockMvc.perform(post("/api/scripts")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Test Script\", \"content\":\"This is a test script.\"}"))
-                .andExpect(status().isBadRequest());
-        verify(scriptService, times(1)).createNewScript(any(), any());
+        ResponseEntity<Script> createdScript = scriptController.postScript(request, mockPrincipal);
+
+        Assert.assertEquals(SCRIPT_1, createdScript.getBody());
+        Assert.assertEquals(HttpStatus.CREATED, createdScript.getStatusCode());
     }
 
     @Test
-    @WithMockUser(username = "testUser")
-    public void deleteScriptTest() {
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        User user = new User("testUser", "", Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")).toString());
-        context.setAuthentication(new UsernamePasswordAuthenticationToken(user, null));
-        SecurityContextHolder.setContext(context);
+    public void deleteScript_shouldReturnDeletedScriptMessage() {
+        when(scriptService.deleteScriptById(1L, mockPrincipal)).thenReturn("Script Deleted");
 
-        Long scriptId = 1L;
-        scriptController.deleteScript(scriptId, SecurityContextHolder.getContext().getAuthentication());
-        verify(scriptService, times(1)).deleteScriptById(scriptId, SecurityContextHolder.getContext().getAuthentication());
+        ResponseEntity<String> deletedScript = scriptController.deleteScript(1L, mockPrincipal);
+
+        Assert.assertEquals("Script Deleted", deletedScript.getBody());
+        Assert.assertEquals(HttpStatus.OK, deletedScript.getStatusCode());
     }
 
     @Test
-    @WithMockUser
-    public void shouldReturnScript() throws Exception {
-        Long scriptId = 1L;
-        Script script = new Script();
-        given(scriptService.getScript(scriptId, null)).willReturn(new ResponseEntity<>(script, HttpStatus.OK));
-        mockMvc.perform(get("/api/scripts/" + scriptId))
-                .andExpect(status().isOk());
+    public void getUserScript_shouldReturnUserScript() {
+        when(scriptService.getScript(1L, mockPrincipal)).thenReturn(SCRIPT_1);
+
+        ResponseEntity<Script> retrievedScript = scriptController.getUserScript(1L, mockPrincipal);
+
+        Assert.assertEquals(SCRIPT_1, retrievedScript.getBody());
+        Assert.assertEquals(HttpStatus.OK, retrievedScript.getStatusCode());
     }
 
     @Test
-    @WithMockUser
-    public void testUpdateScript() throws Exception {
-        ScriptRequest scriptRequest = new ScriptRequest("testName","TstBody");
-        scriptRequest.setName("TestName");
-        scriptRequest.setBody("TestBody");
-        Script script = new Script();
-        script.setScriptId(1L);
-        script.setName("TestScript");
+    public void getAllScriptsByUser_shouldReturnAllScriptsFromUser() {
+        List<Script> expectedScript = new ArrayList<>();
+        expectedScript.add(SCRIPT_Uno);
+        expectedScript.add(SCRIPT_Dos);
+        when(scriptService.getAllScriptsByUser(mockPrincipal)).thenReturn(expectedScript);
 
-        Long scriptId = 1L;
-        when(scriptService.updateOldScript(any(), any(), any())).thenReturn(script);
-        String scriptRequestJson = "{\"name\":\"TestScript\", \"body\":\"This is a test script body\"}";
-        mockMvc.perform(put("/" + scriptId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(scriptRequestJson))
-                .andExpect(status().isCreated());
-        verify(scriptService, times(1)).updateOldScript(any(), any(), any());
+        List<Script> listOfScripts = scriptController.getAllScriptsByUser(mockPrincipal);
+
+        Assert.assertEquals(expectedScript, listOfScripts);
     }
 
     @Test
-    @WithMockUser
-    public void testUpdateScriptNull() throws Exception {
-        ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setName("TestName");
-        scriptRequest.setBody("TestBody");
+    public void updateScript_shouldReturnUpdatedScript() {
+        ScriptRequest request = new ScriptRequest("First Script", "I am a Script");
+        when(scriptService.updateOldScript(mockPrincipal, request, 1L)).thenReturn(SCRIPT_1);
 
-        Long scriptId = 1L;
-        when(scriptService.updateOldScript(any(), any(), any())).thenReturn(null);
-        String scriptRequestJson = "{\"name\":\"TestScript\", \"body\":\"This is a test script body\"}";
-        mockMvc.perform(put("/" + scriptId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(scriptRequestJson))
-                .andExpect(status().isCreated());
+        ResponseEntity<Script> updatedScript = scriptController.updateScript(request, mockPrincipal, 1L);
 
-        verify(scriptService, times(1)).updateOldScript(any(), any(), any());
-    }
-
-    @Test
-    @WithMockUser
-    public void shouldReturnAllScriptsByUser() throws Exception {
-        Script script1 = new Script();
-        Script script2 = new Script();
-        List<Script> scripts = Arrays.asList(script1, script2);
-        given(scriptService.getAllScriptsByUser(any())).willReturn(scripts);
-        mockMvc.perform(get("/api/scripts"))
-                .andExpect(status().isOk());
+        Assert.assertEquals(SCRIPT_1, updatedScript.getBody());
+        Assert.assertEquals(HttpStatus.ACCEPTED, updatedScript.getStatusCode());
     }
 
 }
-
