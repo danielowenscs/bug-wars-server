@@ -69,6 +69,7 @@ public class ScriptService {
 
     public Script getScript(Long scriptId, Principal principal) {
         Optional<User> userOptional = userRepository.findByUsername(principal.getName());
+
         Optional<Script> scriptOptional = scriptRepository.findById(scriptId);
 
         throwUserNotFound(userOptional);
