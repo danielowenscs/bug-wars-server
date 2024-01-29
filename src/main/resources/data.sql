@@ -23,6 +23,13 @@ VALUES
     ('guest_user' ,'$2a$10$PcSvcvAMh0UjiS8CsiNbzulmxR4ua0g3PDg.eNQGTfwXPOQdUIMZC', 'teamchillguest@gmail.com')
 ON CONFLICT (username) DO NOTHING;
 
+--username: admin_user
+--password: sausages
+INSERT INTO users (username, password, email)
+VALUES
+    ('admin_user' ,'$2a$10$PcSvcvAMh0UjiS8CsiNbzulmxR4ua0g3PDg.eNQGTfwXPOQdUIMZC', 'admin123@gmail.com')
+ON CONFLICT (username) DO NOTHING;
+
 INSERT INTO user_roles (user_id, role_id)
 VALUES
     ((SELECT id FROM users WHERE username = 'test_user'), (SELECT id FROM roles WHERE name = 'ROLE_USER'))
@@ -36,6 +43,11 @@ ON CONFLICT (user_id, role_id) DO NOTHING;
 INSERT INTO user_roles (user_id, role_id)
 VALUES
     ((SELECT id FROM users WHERE username = 'guest_user'), (SELECT id FROM roles WHERE name = 'ROLE_GUEST'))
+ON CONFLICT (user_id, role_id) DO NOTHING;
+
+INSERT INTO user_roles (user_id, role_id)
+VALUES
+    ((SELECT id FROM users WHERE username = 'admin_user'), (SELECT id FROM roles WHERE name = 'ROLE_ADMIN'))
 ON CONFLICT (user_id, role_id) DO NOTHING;
 
 --Scripts
