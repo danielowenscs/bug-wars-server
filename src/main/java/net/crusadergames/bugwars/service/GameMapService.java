@@ -39,6 +39,12 @@ public class GameMapService {
         return mapList;
     }
 
+    public GameMap getGameMapById(Long gameMapId) throws Exception{
+        Optional<GameMap> optionalGameMap = gameMapRepository.findById(gameMapId);
+        throwMapNotFound(optionalGameMap);
+        GameMap gameMap = optionalGameMap.get();
+        return gameMap;
+    }
 
     public GameMap createNewGameMap(Principal principal, GameMapRequest gameMapRequest) throws Exception {
         if (!isAdmin(principal.getName())) {
@@ -72,14 +78,24 @@ public class GameMapService {
 
         throwMapNotFound(optionalGameMap);
 
-        if (mapNameAlreadyExists(oldGameMap.getName())) {
+        GameMap newGameMap = new GameMap(gameMapId, gameMapRequest.getName(), gameMapRequest.getHeight(), gameMapRequest.getWidth(), gameMapRequest.getBody());
+        if (mapNameAlreadyExists(newGameMap.getName())) {
             throw new Exception("Map name already exists");
         }
-
-        GameMap newGameMap = new GameMap(gameMapId, gameMapRequest.getName(), gameMapRequest.getHeight(), gameMapRequest.getWidth(), gameMapRequest.getBody());
         gameMapRepository.save(newGameMap);
 
         return newGameMap;
+    }
+
+    public String deleteGameMapById(Long gameMapId, Principal principal) throws Exception{
+        if (!isAdmin(principal.getName())) {
+            throw new Exception("Unauthorized User");
+        }
+        Optional<GameMap> optionalGameMap = gameMapRepository.findById(gameMapId);
+        throwMapNotFound(optionalGameMap);
+
+        gameMapRepository.deleteById(gameMapId);
+        return ("Game map successfully deleted");
     }
 
     public boolean isAdmin(String username) {
