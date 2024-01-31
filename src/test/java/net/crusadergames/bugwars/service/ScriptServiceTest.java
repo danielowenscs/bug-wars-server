@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ScriptServiceTest {
     private final User USER = new User(1L,"jeff", "gmail@email.com", "passing");
@@ -113,7 +113,8 @@ public class ScriptServiceTest {
 
         scriptService.deleteScriptById(1L, mockPrincipal);
 
-        when(scriptRepository.findById(1L)).thenReturn(Optional.empty());
+        verify(scriptRepository, times(1)).deleteById(1L);
+
     }
 
     @Test

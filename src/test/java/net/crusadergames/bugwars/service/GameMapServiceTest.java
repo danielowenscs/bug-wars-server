@@ -2,14 +2,19 @@ package net.crusadergames.bugwars.service;
 
 import lombok.SneakyThrows;
 import net.crusadergames.bugwars.dto.request.GameMapRequest;
+import net.crusadergames.bugwars.dto.request.ScriptRequest;
+import net.crusadergames.bugwars.exceptions.MapNameAlreadyExistsException;
+import net.crusadergames.bugwars.exceptions.MapNameOrBodyBlankException;
 import net.crusadergames.bugwars.exceptions.NotAnAdminException;
 import net.crusadergames.bugwars.model.GameMap;
+import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.ERole;
 import net.crusadergames.bugwars.model.auth.Role;
 import net.crusadergames.bugwars.model.auth.User;
 import net.crusadergames.bugwars.repository.GameMapRepository;
 import net.crusadergames.bugwars.repository.auth.UserRepository;
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -24,7 +29,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class GameMapServiceTest {
 
@@ -51,7 +56,6 @@ class GameMapServiceTest {
         userRepository=Mockito.mock(UserRepository.class);
         mockPrincipal=Mockito.mock(Principal.class);
         gameMapService = new GameMapService(gameMapRepository,userRepository);
-
         allMaps.add(MAP_1);
         allMaps.add(MAP_2);
     }
@@ -110,30 +114,100 @@ class GameMapServiceTest {
     @Test
     void createNewGameMap_ShouldThrowExceptionIfUserIsNotAdmin() {
         Assert.assertThrows(NotAnAdminException.class,()->{
-            GameMapRequest gmRequest = new GameMapRequest("Map 1",5L,5L,"11111\n10001\n10101\n11011\n11111");
+            GameMapRequest gmRequest = new GameMapRequest("Map 1",5L,5L,"11\n11");
             when(userRepository.findByUsername(any())).thenReturn(Optional.of(USER));
             GameMap createdMap = gameMapService.createNewGameMap(mockPrincipal,gmRequest);
         });
-
-
     }
     @Test
     void createNewGameMap_ShouldThrowExceptionIfMapNameExists() {
+        Assert.assertThrows(MapNameAlreadyExistsException.class,()->{
+            GameMapRequest gmRequest = new GameMapRequest("Map 1",2L,2L,"11\n11");
+            when(userRepository.findByUsername(any())).thenReturn(Optional.of(ADMIN));
+            when(gameMapRepository.findByNameIgnoreCase(any())).thenReturn(Optional.of(MAP_1));
+            GameMap createdMap = gameMapService.createNewGameMap(mockPrincipal,gmRequest);
+        });
     }
     @Test
     void createNewGameMap_ShouldThrowExceptionIfTitleOrBodyIsBlank() {
+        Assert.assertThrows(MapNameOrBodyBlankException.class,()->{
+            GameMapRequest gmRequest = new GameMapRequest("",2L,2L,"");
+            when(userRepository.findByUsername(any())).thenReturn(Optional.of(ADMIN));
+            GameMap createdMap = gameMapService.createNewGameMap(mockPrincipal,gmRequest);
+        });
     }
 
+    @SneakyThrows
     @Test
-    void updateMap() {
+    void updateMap_ShouldReturnNewMap() {
+        when(userRepository.findByUsername(any())).thenReturn(Optional.ofNullable(ADMIN));
+        when(gameMapRepository.findById(any())).thenReturn(Optional.of(OLD_MAP));
+        GameMapRequest oldRequest = new GameMapRequest("Old Map",5L,5L,"11111\n10001\n10101\n11011\n11111");
+        GameMapRequest newRequest = new GameMapRequest("I Am New",2L,2L,"11\n11");
+        gameMapService.createNewGameMap(mockPrincipal,oldRequest);
+
+        GameMap newMap = gameMapService.updateMap(mockPrincipal, newRequest, 1L);
+
+        Assert.assertNotNull (newMap);
+        Assert.assertEquals(newMap.getId(), NEW_MAP.getId());
+        Assert.assertEquals(newMap, NEW_MAP);
+    }
+    @Test
+    void updateMap_ShouldThrowExceptionIfUserIsNotAdmin() {
+        GameMap oldMap = MAP_1;
+
+        Assert.assertThrows(NotAnAdminException.class,()->{
+            GameMapRequest newRequest = new GameMapRequest("Map 1",2L,2L,"11\n11");
+            when(userRepository.findByUsername(any())).thenReturn(Optional.of(USER));
+            gameMapService.updateMap(mockPrincipal,newRequest, oldMap.getId());
+        });
+    }
+    @Test
+    void updateMap_ShouldThrowExceptionIfMapNameExists() {
+        GameMap oldMap = OLD_MAP;
+        Assert.assertThrows(MapNameAlreadyExistsException.class,()->{
+            GameMapRequest newRequest = new GameMapRequest("Map 2",2L,2L,"11\n11");
+            when(userRepository.findByUsername(any())).thenReturn(Optional.of(ADMIN));
+            when(gameMapRepository.findById(any())).thenReturn(Optional.of(oldMap));
+            when(gameMapRepository.findByNameIgnoreCase(any())).thenReturn(Optional.of(MAP_2));
+            gameMapService.updateMap(mockPrincipal,newRequest,oldMap.getId());
+        });
+    }
+    @Test
+    void updateMap_ShouldThrowExceptionIfTitleOrBodyIsBlank() {
+        GameMap oldMap = OLD_MAP;
+        Assert.assertThrows(MapNameOrBodyBlankException.class,()->{
+            when(userRepository.findByUsername(any())).thenReturn(Optional.of(ADMIN));
+            when(gameMapRepository.findById(any())).thenReturn(Optional.of(oldMap));
+            GameMapRequest newRequest = new GameMapRequest("",2L,2L,"");
+            when(userRepository.findByUsername(any())).thenReturn(Optional.of(ADMIN));
+            gameMapService.updateMap(mockPrincipal,newRequest,oldMap.getId());
+        });
     }
 
+    @SneakyThrows
     @Test
-    void deleteGameMapById() {
+    void deleteGameMapById_ShouldDeleteCorrectMap() {
+        when(userRepository.findByUsername(any())).thenReturn(Optional.ofNullable(ADMIN));
+        when(gameMapRepository.findById(any())).thenReturn(Optional.of(MAP_1));
+
+        gameMapService.deleteGameMapById(1L,mockPrincipal);
+
+        verify(gameMapRepository, times(1)).deleteById(1L);
+    }
+    @Test
+    void deleteMap_ShouldThrowExceptionIfNotAdmin() {
+        Assert.assertThrows(NotAnAdminException.class,()->{
+            when(userRepository.findByUsername(any())).thenReturn(Optional.of(USER));
+            gameMapService.deleteGameMapById(1L,mockPrincipal);
+
+        });
+
     }
 
     @Test
     void isAdmin() {
+
     }
 
     @Test

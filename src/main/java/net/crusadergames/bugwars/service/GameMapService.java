@@ -74,7 +74,6 @@ public class GameMapService {
         }
 
         Optional<GameMap> optionalGameMap = gameMapRepository.findById(gameMapId);
-        GameMap oldGameMap = optionalGameMap.get();
 
         throwMapNotFound(optionalGameMap);
 
