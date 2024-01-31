@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.service;
+package net.crusadergames.bugwars.parser;
 
 import net.crusadergames.bugwars.exceptions.parser.SyntaxException;
 import org.springframework.stereotype.Service;
@@ -8,14 +8,18 @@ import java.util.*;
 @Service
 public class ParserService {
 
-    public boolean validateScript(String scriptBody) {
+    public static void main(String[] args) {
         String script = "    :START  attack\n" +
                 "     moveForward\n" +
-                "\n" +
                 "    GOTO DOBBY\n" +
                 ":DOBBY  eat \n";
+        validateScript(script);
+    }
 
-        List<String> lines = new ArrayList<String>(Arrays.asList(script.split("\\n")));
+    public static boolean validateScript(String scriptBody) {
+
+
+        List<String> lines = new ArrayList<String>(Arrays.asList(scriptBody.split("\\n")));
         Map<String, Boolean> declaredLabels = new HashMap<>();
 
         for (int i = 0; i < lines.size(); i++) {
