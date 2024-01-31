@@ -1,8 +1,7 @@
 package net.crusadergames.bugwars.service;
 
 import net.crusadergames.bugwars.dto.request.GameMapRequest;
-import net.crusadergames.bugwars.exceptions.ScriptNameAlreadyExistsException;
-import net.crusadergames.bugwars.exceptions.ScriptSaveException;
+import net.crusadergames.bugwars.exceptions.*;
 import net.crusadergames.bugwars.model.GameMap;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.model.auth.ERole;
@@ -14,6 +13,7 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.naming.NameNotFoundException;
 import javax.swing.text.html.Option;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -48,15 +48,15 @@ public class GameMapService {
 
     public GameMap createNewGameMap(Principal principal, GameMapRequest gameMapRequest) throws Exception {
         if (!isAdmin(principal.getName())) {
-            throw new Exception("Unauthorized User");
+            throw new NotAnAdminException();
         }
 
         if (gameMapRequest.getName().isBlank() || gameMapRequest.getBody().isBlank()) {
-            throw new Exception("Error: title or body is empty");
+            throw new MapNameOrBodyBlankException();
         }
 
         if (mapNameAlreadyExists(gameMapRequest.getName())) {
-            throw new Exception("Map name already exists");
+            throw new MapNameAlreadyExistsException();
         }
 
         GameMap gameMap = new GameMap(null, gameMapRequest.getName(), gameMapRequest.getHeight(), gameMapRequest.getWidth(), gameMapRequest.getBody());
@@ -66,11 +66,11 @@ public class GameMapService {
 
     public GameMap updateMap(Principal principal, GameMapRequest gameMapRequest, Long gameMapId) throws Exception{
         if (!isAdmin(principal.getName())) {
-            throw new Exception("Unauthorized User");
+            throw new NotAnAdminException();
         }
 
         if (gameMapRequest.getName().isBlank() || gameMapRequest.getBody().isBlank()) {
-            throw new Exception("Error: title or body is empty");
+            throw new MapNameOrBodyBlankException();
         }
 
         Optional<GameMap> optionalGameMap = gameMapRepository.findById(gameMapId);
@@ -80,7 +80,7 @@ public class GameMapService {
 
         GameMap newGameMap = new GameMap(gameMapId, gameMapRequest.getName(), gameMapRequest.getHeight(), gameMapRequest.getWidth(), gameMapRequest.getBody());
         if (mapNameAlreadyExists(newGameMap.getName())) {
-            throw new Exception("Map name already exists");
+            throw new MapNameAlreadyExistsException();
         }
         gameMapRepository.save(newGameMap);
 
@@ -89,7 +89,7 @@ public class GameMapService {
 
     public String deleteGameMapById(Long gameMapId, Principal principal) throws Exception{
         if (!isAdmin(principal.getName())) {
-            throw new Exception("Unauthorized User");
+            throw new NotAnAdminException();
         }
         Optional<GameMap> optionalGameMap = gameMapRepository.findById(gameMapId);
         throwMapNotFound(optionalGameMap);
@@ -123,7 +123,7 @@ public class GameMapService {
 
     private void throwMapNotFound(Optional<GameMap> gameMap) throws Exception {
         if (gameMap.isEmpty()) {
-            throw new Exception("Game map not found");
+            throw new NameNotFoundException("Map name not found");
         }
     }
 
