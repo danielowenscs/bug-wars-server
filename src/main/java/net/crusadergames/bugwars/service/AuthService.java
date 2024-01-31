@@ -44,15 +44,21 @@ public class AuthService {
     private JwtUtils jwtUtils;
 
     public User registerUser(SignupRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+
+        if(signUpRequest.getUsername().matches(".*\\s.*") || signUpRequest.getEmail().matches(".*\\s.*") ||
+                signUpRequest.getPassword().matches(".*\\s.*")){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No spaces allowed in any field");
+        }
+
+        if (userRepository.existsByUsernameIgnoreCase(signUpRequest.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already taken");
         }
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userRepository.existsByEmailIgnoreCase(signUpRequest.getEmail())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already taken");
         }
 
-        User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
+        User user = new User(signUpRequest.getUsername().toLowerCase(), signUpRequest.getEmail(),
                 passwordEncoder.encode(signUpRequest.getPassword()));
 
         Optional<Role> optUserRole = roleRepository.findByName(ERole.ROLE_USER);
@@ -66,7 +72,7 @@ public class AuthService {
 
     public JwtResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername().toLowerCase(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);

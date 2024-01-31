@@ -1,6 +1,7 @@
 package net.crusadergames.bugwars.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import net.crusadergames.bugwars.controller.AuthController;
 import net.crusadergames.bugwars.dto.request.LoginRequest;
 import net.crusadergames.bugwars.dto.request.SignupRequest;
 import net.crusadergames.bugwars.dto.response.JwtResponse;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @WebMvcTest(controllers = AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
-public class AuthControllerTests {
+public class AuthControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
