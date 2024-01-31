@@ -12,7 +12,7 @@ public class Commands {
         conditionals.put("ifFood", 32);
         conditionals.put("ifEmpty", 33);
         conditionals.put("ifWall", 34);
-        conditionals.put("GOTO", 35);
+        conditionals.put("goto", 35);
         return conditionals;
     }
 

@@ -7,7 +7,6 @@ import net.crusadergames.bugwars.parser.maybe.TokenTypes;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class Token {
 
     private TokenTypes tokenType;

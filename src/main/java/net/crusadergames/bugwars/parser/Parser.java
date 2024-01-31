@@ -1,6 +1,8 @@
 package net.crusadergames.bugwars.parser;
 
 import net.crusadergames.bugwars.exceptions.parser.SyntaxException;
+import net.crusadergames.bugwars.parser.maybe.Token;
+import net.crusadergames.bugwars.parser.maybe.TokenTypes;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,106 +13,137 @@ import java.util.Map;
 @Service
 public class Parser {
 
-    private List<Integer> bytecode = new ArrayList<>();
-    private Map<String,Integer> labels = new HashMap<>();
+    private final List<Integer> bytecode;
+    private final Map<String,Integer> definedLabels = new HashMap<>();
+    public static class UndefinedLabel {
+        public String undefinedLabel;
+        public int locationInBytecode;
+        public UndefinedLabel(String undefinedLabel, int locationInBytecode) {
+            this.undefinedLabel = undefinedLabel;
+            this.locationInBytecode = locationInBytecode;
+        }
+    }
+    private final List<UndefinedLabel> undefinedLabels = new ArrayList<>();
+
+
     private final Map<String, Integer> actionCommands = Commands.getActionCommands();
     private final Map<String, Integer> conditionalCommands = Commands.getConditionalCommands();
+    private final Tokenizer tokenizer;
+    private boolean isValidScript = false;
 
-    public boolean isLocation = false;
+    public Parser(String scriptBody) {
+        this.tokenizer = new Tokenizer(scriptBody);
+        this.bytecode = parseScript();
+        this.isValidScript = true;
+    }
+    public List<Integer> getByteCode(){
+        return this.bytecode;
+    }
 
-    public List<Integer> parseTokens(List<String> tokens) {
-        Map<String, Integer> labels = getLabels(tokens);
+    public boolean isValidScript() {
+        return this.isValidScript;
+    }
 
-        for (String token : tokens) {
-
-            if(isLocation){
-                processConditionalLocation(token);
-            }else if (token.startsWith(":")) {
-                // process label
-                processLabel(token);
-            } else if (isActionCommand(token)) {
-                // process action command
-                processActionCommand(token);
-            } else if (isConditionalCommand(token)) {
-                // process conditional command
-                processConditionalCommand(token);
-            } else {
-                throw new SyntaxException("Command not found " + token);
+    private List<Integer> parseScript() {
+        List<Integer> bytecode = new ArrayList<>();
+        int lineNumber = 1;
+        while(tokenizer.hasNextToken()) {
+            Token currentToken = tokenizer.peekNextToken();
+            if(currentToken.getTokenType().equals(TokenTypes.COLON)){
+                tokenizer.getNextToken();
+                processDefineLabel(bytecode, lineNumber);
+            } else if(currentToken.getTokenType().equals(TokenTypes.ACTION)){
+                processExpression(bytecode, lineNumber, tokenizer.getNextToken());
+            } else if(currentToken.getTokenType().equals(TokenTypes.CONDITIONAL)){
+                processExpression(bytecode, lineNumber, tokenizer.getNextToken());
+            } else if(currentToken.getTokenType().equals(TokenTypes.WHITESPACE)){
+                tokenizer.getNextToken();
+            }else if (currentToken.getTokenType().equals(TokenTypes.INVALID_TOKEN)) {
+                throw new SyntaxException("Invalid syntax: " + currentToken.getValue() + " at line " + lineNumber);
+            }else if(currentToken.getTokenType().equals(TokenTypes.NEWLINE)) {
+                tokenizer.getNextToken();
+                lineNumber++;
+            }else if(currentToken.getTokenType().equals(TokenTypes.COMMENT)) {
+                tokenizer.getNextToken();
             }
         }
 
-
+        for(UndefinedLabel undefinedLabelPair : undefinedLabels) {
+            if(!definedLabels.containsKey(undefinedLabelPair.undefinedLabel)) {
+                throw new SyntaxException("Label: " + undefinedLabelPair.undefinedLabel + " was undefined");
+            }
+            bytecode.set(undefinedLabelPair.locationInBytecode, definedLabels.get(undefinedLabelPair.undefinedLabel));
+        }
         return bytecode;
     }
 
-    private void processConditionalLocation(String token) {
-        if(!labels.containsKey(token)){
-            throw new SyntaxException("Label does not exist: " + token);
-        }
-        bytecode.add(labels.get(token));
-        isLocation = false;
-    }
-
-
-    private void processActionCommand(String token) {
-        bytecode.add(actionCommands.get(token));
-    }
-
-    private void processConditionalCommand(String token) {
-        bytecode.add(conditionalCommands.get(token));
-        isLocation = true;
-    }
-
-    private void processLabel(String token) {
-        String label = token.substring(1);
-        if(label.isBlank()){
-            throw new SyntaxException("Label " + " " +  " has to have a name");
-        }
-        if (!isValidLabel(label)) {
-            throw new SyntaxException("Labels have to be alphanumerical, and start with a letter");
-        }
-        if(labels.containsKey(label)){
-            throw new SyntaxException("Cannot invoke the same label twice :" + label);
-        }
-        labels.put(label, bytecode.size());
-    }
-
-    public Map<String, Integer> getLabels(List<String> tokens) {
-        Map<String, Integer> labels = new HashMap<>();
-        int instructionPointer = 0;
-        for (String token : tokens) {
-            if (token.contains("#")) {
-                int colonIndex = token.indexOf(":");
-
-                if (colonIndex > 0) {
-                    throw new SyntaxException("labels have to start at the beginning on the line");
-                }
-                String label = token.substring(1);
-                if (!isValidLabel(label)) {
-                    throw new SyntaxException("Labels have to be alphanumerical, and start with a letter");
-                }
-                labels.put(label, instructionPointer);
-            } else if (isConditionalCommand(token)) {
-                instructionPointer += 2;
-            } else if (isActionCommand(token)) {
-                instructionPointer++;
+    private boolean hasExpressionAfterWhitespace() {
+        boolean isEnd = !tokenizer.hasNextToken();
+        boolean hasExpression = false;
+        while(!isEnd && !hasExpression) {
+            Token nextToken = tokenizer.peekNextToken();
+            if(nextToken.getTokenType().equals(TokenTypes.COMMENT) || nextToken.getTokenType().equals(TokenTypes.WHITESPACE)) {
+                tokenizer.getNextToken();
+                isEnd = !tokenizer.hasNextToken();
+            } else {
+                hasExpression = true;
             }
+        }
+        return hasExpression;
+    }
 
+    private void processDefineLabel(List<Integer> bytecode,int lineNumber){
+        if(!tokenizer.hasNextToken()) {
+            throw new SyntaxException("Expected label on line: " + lineNumber);
+        }
+        Token currentToken = tokenizer.getNextToken();
+        if(currentToken.getTokenType() != TokenTypes.LABEL) {
+            throw new SyntaxException("Labels have to be alphanumerical, and start with a letter" + " at line " + lineNumber);
         }
 
-        return labels;
+        String label = currentToken.getValue();
+        if(definedLabels.containsKey(label)){
+            throw new SyntaxException("Cannot define the same label twice :" + label + " at line " + lineNumber);
+        }
+        definedLabels.put(label, bytecode.size());
+        if(hasExpressionAfterWhitespace()) {
+            if(!tokenizer.peekNextToken().getTokenType().equals(TokenTypes.NEWLINE)) {
+                processExpression(bytecode,lineNumber,tokenizer.getNextToken());
+            }
+        }
     }
-
-    public static Boolean isValidLabel(String label) {
-        return label.matches("[A-Z][A-Z0-9]*");
+    private void processExpression(List<Integer> bytecode, int lineNumber,Token currentToken){
+        if (currentToken.getTokenType().equals(TokenTypes.ACTION)) {
+                bytecode.add(actionCommands.get(currentToken.getValue()));
+                if(hasExpressionAfterWhitespace()) {
+                    if(!tokenizer.peekNextToken().getTokenType().equals(TokenTypes.NEWLINE)) {
+                        throw new SyntaxException("Only one operation per line at line " + lineNumber);
+                    }
+                }
+            } else if (currentToken.getTokenType().equals(TokenTypes.CONDITIONAL)) {
+                bytecode.add(conditionalCommands.get(currentToken.getValue()));
+                if (!tokenizer.hasNextToken()) {
+                    throw new SyntaxException("Expected whitespace after the conditional at line " + lineNumber);
+                }
+                Token nextToken = tokenizer.getNextToken();
+                if (!nextToken.getTokenType().equals(TokenTypes.WHITESPACE)) {
+                    throw new SyntaxException("Expected whitespace after the conditional at line " + lineNumber);
+                }
+                nextToken = tokenizer.getNextToken();
+                String label = nextToken.getValue();
+                if (definedLabels.containsKey(label)) {
+                    bytecode.add(definedLabels.get(label));
+                } else {
+                    undefinedLabels.add(new UndefinedLabel(label, bytecode.size()));
+                    bytecode.add(0);
+                }
+                if(hasExpressionAfterWhitespace()) {
+                    if(!tokenizer.peekNextToken().getTokenType().equals(TokenTypes.NEWLINE)) {
+                        throw new SyntaxException("Only one operation per line at line " + lineNumber);
+                    }
+                }
+            } else {
+                throw new SyntaxException("Expected action or conditional at line " + lineNumber);
+            }
     }
-
-    private boolean isConditionalCommand(String token) {
-        return conditionalCommands.containsKey(token);
-    }
-
-    private boolean isActionCommand(String token) {
-        return actionCommands.containsKey(token);
-    }
-
 }

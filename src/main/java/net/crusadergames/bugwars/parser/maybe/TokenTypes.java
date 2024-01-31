@@ -3,9 +3,10 @@ package net.crusadergames.bugwars.parser.maybe;
 public enum TokenTypes {
     LABEL,
     WHITESPACE,
-    TAB,
     ACTION,
     CONDITIONAL,
     COLON,
+    COMMENT,
+    NEWLINE,
     INVALID_TOKEN
 }

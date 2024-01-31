@@ -5,7 +5,7 @@ import net.crusadergames.bugwars.exceptions.ScriptNotFoundException;
 import net.crusadergames.bugwars.model.Script;
 import net.crusadergames.bugwars.repository.script.ScriptRepository;
 import net.crusadergames.bugwars.service.ScriptService;
-import net.crusadergames.bugwars.parser.ParserService;
+import net.crusadergames.bugwars.service.ParserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
