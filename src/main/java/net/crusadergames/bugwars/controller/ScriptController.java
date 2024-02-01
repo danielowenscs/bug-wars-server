@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import net.crusadergames.bugwars.dto.request.ScriptRequest;
 import net.crusadergames.bugwars.model.Script;
 
+
 import net.crusadergames.bugwars.service.ScriptService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,12 +21,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScriptController {
 
+
     private final ScriptService scriptService;
+
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping()
     public ResponseEntity<Script> postScript(@RequestBody ScriptRequest scriptRequest, Principal principal) {
         Script script = scriptService.createNewScript(principal, scriptRequest);
+
+
 
         return new ResponseEntity<>(script, HttpStatus.CREATED);
     }
@@ -36,6 +40,7 @@ public class ScriptController {
         String response = scriptService.deleteScriptById(scriptId, principal);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+
     }
 
     @GetMapping("/{scriptId}")

@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+
 import static net.crusadergames.bugwars.Util.Constants.RESPONSE_SCRIPTDELETED;
 
 @Service
@@ -21,6 +22,9 @@ public class ScriptService {
 
     @Autowired
     ScriptRepository scriptRepository;
+
+//    @Autowired
+//    ParserUtil parser;
 
     @Autowired
     UserRepository userRepository;
@@ -31,6 +35,11 @@ public class ScriptService {
     }
 
     public Script createNewScript(Principal principal, ScriptRequest scriptRequest) {
+        // parser.CheckScription(scriptRequest);
+            // True or "Correct"
+                // continue
+            // False or "Invalid"
+                // Stop and throw Error
         if (scriptRequest.getName().isBlank() || scriptRequest.getBody().isBlank()) {
             throw new ScriptSaveException();
         }
@@ -86,8 +95,10 @@ public class ScriptService {
     }
 
     public Script updateOldScript(Principal principal, ScriptRequest scriptRequest, Long scriptId) {
+
         Optional<Script> optionalScript = scriptRepository.findById(scriptId);
         Optional<User> optionalUser = userRepository.findByUsername(principal.getName());
+
 
         throwUserNotFound(optionalUser);
         throwScriptNotPresent(optionalScript);
