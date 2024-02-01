@@ -23,6 +23,13 @@ VALUES
     ('guest_user' ,'$2a$10$PcSvcvAMh0UjiS8CsiNbzulmxR4ua0g3PDg.eNQGTfwXPOQdUIMZC', 'teamchillguest@gmail.com')
 ON CONFLICT (username) DO NOTHING;
 
+--username: admin_user
+--password: sausages
+INSERT INTO users (username, password, email)
+VALUES
+    ('admin_user' ,'$2a$10$PcSvcvAMh0UjiS8CsiNbzulmxR4ua0g3PDg.eNQGTfwXPOQdUIMZC', 'admin123@gmail.com')
+ON CONFLICT (username) DO NOTHING;
+
 INSERT INTO user_roles (user_id, role_id)
 VALUES
     ((SELECT id FROM users WHERE username = 'test_user'), (SELECT id FROM roles WHERE name = 'ROLE_USER'))
@@ -36,6 +43,11 @@ ON CONFLICT (user_id, role_id) DO NOTHING;
 INSERT INTO user_roles (user_id, role_id)
 VALUES
     ((SELECT id FROM users WHERE username = 'guest_user'), (SELECT id FROM roles WHERE name = 'ROLE_GUEST'))
+ON CONFLICT (user_id, role_id) DO NOTHING;
+
+INSERT INTO user_roles (user_id, role_id)
+VALUES
+    ((SELECT id FROM users WHERE username = 'admin_user'), (SELECT id FROM roles WHERE name = 'ROLE_ADMIN'))
 ON CONFLICT (user_id, role_id) DO NOTHING;
 
 --Scripts
@@ -59,7 +71,7 @@ VALUES
 --GameMaps
 INSERT INTO game_maps (name,height,width,body)
 VALUES
-(E'Willy Wonka\'s Doghouse',5,5,E'XXXXX\nX   X\nX X X\nXX XX\nXXXXX'),
-('Crusader Saloon',7,7,E'XXXXXXX\nX     X\nX     X\nX     X\nX     X\nX     X\nXXXXXXX'),
-('Fiery Dragon Layer',3,3,E'XXX\nX X\nXXX');
+(E'Willy Wonka\'s Doghouse',5,5,E'11111\n10001\n10101\n11011\n11111'),
+('Crusader Saloon',7,7,E'1111111\n1000001\n1000001\n1000001\n1000001\n1000001\n1111111'),
+('Fiery Dragon Layer',3,3,E'111\n101\n111');
 

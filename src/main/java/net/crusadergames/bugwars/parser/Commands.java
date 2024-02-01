@@ -1,7 +1,6 @@
 package net.crusadergames.bugwars.parser;
 
 import net.crusadergames.bugwars.Util.Constants;
-
 import java.util.HashMap;
 import java.util.Map;
 
