@@ -1,8 +1,7 @@
 package net.crusadergames.bugwars.parser;
 
-import net.crusadergames.bugwars.parser.maybe.Token;
-import net.crusadergames.bugwars.parser.maybe.TokenTypes;
-import org.springframework.stereotype.Service;
+import net.crusadergames.bugwars.model.token.Token;
+import net.crusadergames.bugwars.model.token.TokenTypes;
 
 import java.util.*;
 
@@ -23,27 +22,27 @@ public class Tokenizer {
     private int currentToken;
     private final String scriptBody;
 
-    public static void main(String[] args) {
-        String testScript = "#Test\n" +
-                ":START  eat\n" +
-                "att\n" +
-                "mov\n" +
-                "att\n" +
-                "   ifFood EAT\n" +
-                "        att\n" +
-                "      att\n" +
-                "      goto EAT\n" +
-                "        att\n" +
-                "        att\n" +
-                "        att\n" +
-                "        att\n" +
-                ":EAT  eat\n" +
-                "      goto START\n" +
-                "     mov\n";
-         new Tokenizer(testScript);
-         Parser parser = new Parser(testScript);
-         System.out.println(parser.getByteCode().toString());
-    }
+//    public static void main(String[] args) {
+//        String testScript = "#Test\n" +
+//                ":START  eat\n" +
+//                "att\n" +
+//                "mov\n" +
+//                "att\n" +
+//                "   ifFood EAT\n" +
+//                "        att\n" +
+//                "      att\n" +
+//                "      goto EAT\n" +
+//                "        att\n" +
+//                "        att\n" +
+//                "        att\n" +
+//                "        att\n" +
+//                ":EAT  eat\n" +
+//                "      goto START\n" +
+//                "     mov\n";
+//         new Tokenizer(testScript);
+//         Parser parser = new Parser(testScript);
+//         System.out.println(parser.returnByteCode().toString());
+//    }
 
     public Tokenizer(String scriptBody) {
         this.scriptBody = scriptBody;

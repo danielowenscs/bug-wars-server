@@ -1,9 +1,7 @@
-package net.crusadergames.bugwars.parser.maybe;
+package net.crusadergames.bugwars.model.token;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import net.crusadergames.bugwars.parser.maybe.TokenTypes;
 
 @Data
 @AllArgsConstructor

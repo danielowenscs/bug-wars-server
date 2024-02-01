@@ -1,5 +1,7 @@
 package net.crusadergames.bugwars.parser;
 
+import net.crusadergames.bugwars.Util.Constants;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,23 +9,23 @@ public class Commands {
 
     public static Map<String, Integer> getConditionalCommands() {
         Map<String, Integer> conditionals = new HashMap<>();
-        conditionals.put("ifEnemy", 30);
-        conditionals.put("ifAlly", 31);
-        conditionals.put("ifFood", 32);
-        conditionals.put("ifEmpty", 33);
-        conditionals.put("ifWall", 34);
-        conditionals.put("goto", 35);
+        conditionals.put(Constants.CONDITIONALCOMMAND_IFENEMY, 30);
+        conditionals.put(Constants.CONDITIONALCOMMAND_IFALLY, 31);
+        conditionals.put(Constants.CONDITIONALCOMMAND_IFFOOD, 32);
+        conditionals.put(Constants.CONDITIONALCOMMAND_IFEMPTY, 33);
+        conditionals.put(Constants.CONDITIONALCOMMAND_IFWALL, 34);
+        conditionals.put(Constants.CONDITIONALCOMMAND_GOTO, 35);
         return conditionals;
     }
 
     public static Map<String, Integer> getActionCommands() {
         Map<String, Integer> actions = new HashMap<>();
-        actions.put("noop", 0);
-        actions.put("mov", 10);
-        actions.put("rotr", 11);
-        actions.put("rotl", 12);
-        actions.put("att", 13);
-        actions.put("eat", 14);
+        actions.put(Constants.ACTIONCOMMAND_NOOP, 0);
+        actions.put(Constants.ACTIONCOMMAND_MOV, 10);
+        actions.put(Constants.ACTIONCOMMAND_ROTR, 11);
+        actions.put(Constants.ACTIONCOMMAND_ROTL, 12);
+        actions.put(Constants.ACTIONCOMMAND_ATT, 13);
+        actions.put(Constants.ACTIONCOMMAND_EAT, 14);
         return actions;
     }
 }

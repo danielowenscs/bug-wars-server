@@ -1,4 +1,4 @@
-package net.crusadergames.bugwars.parser.maybe;
+package net.crusadergames.bugwars.model.token;
 
 public enum TokenTypes {
     LABEL,

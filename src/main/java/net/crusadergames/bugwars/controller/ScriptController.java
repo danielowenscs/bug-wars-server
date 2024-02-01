@@ -2,13 +2,10 @@ package net.crusadergames.bugwars.controller;
 
 import lombok.RequiredArgsConstructor;
 import net.crusadergames.bugwars.dto.request.ScriptRequest;
-import net.crusadergames.bugwars.exceptions.ScriptNotFoundException;
 import net.crusadergames.bugwars.model.Script;
 
 
 import net.crusadergames.bugwars.service.ScriptService;
-import net.crusadergames.bugwars.service.ParserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 
 @CrossOrigin
 @RestController
