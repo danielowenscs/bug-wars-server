@@ -111,7 +111,7 @@ public class Tokenizer {
         TokenTypes currentTokenType = TokenTypes.INVALID_TOKEN;
         int operationLength = scriptBody.charAt(streamIndex) != 'r' ? OPERATION_MIN_NONROTATE_SIZE : OPERATION_MIN_ROTATE_SIZE;
         int endIndex = streamIndex + operationLength;
-        boolean isValidOperation = endIndex < scriptBody.length();
+        boolean isValidOperation = endIndex <= scriptBody.length();
         if(isValidOperation) {
             if(VALID_OPERATIONS.contains(scriptBody.substring(streamIndex,endIndex))){
                 currentTokenValue = scriptBody.substring(streamIndex,endIndex);
@@ -126,11 +126,11 @@ public class Tokenizer {
         TokenTypes currentTokenType = TokenTypes.INVALID_TOKEN;
         int conditionalLength = scriptBody.charAt(streamIndex) == 'g' ? GOTO_SIZE : UNIQUE_CONDTIONAL_INDEX;
         int endIndex = streamIndex + conditionalLength;
-        boolean isValidConditional = endIndex < scriptBody.length();
+        boolean isValidConditional = endIndex <= scriptBody.length();
         if(isValidConditional && scriptBody.charAt(streamIndex) != 'g') {
             conditionalLength = scriptBody.charAt(endIndex) == 'E' ? CONDITIONAL_MAX_SIZE : CONDITIONAL_MIN_SIZE;
             endIndex = streamIndex + conditionalLength;
-            isValidConditional = endIndex < scriptBody.length();
+            isValidConditional = endIndex <= scriptBody.length();
         }
         if(isValidConditional) {
             if(VALID_CONDITIONALS.contains(scriptBody.substring(streamIndex,endIndex))) {

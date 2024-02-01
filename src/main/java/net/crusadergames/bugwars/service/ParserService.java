@@ -111,6 +111,9 @@ public class ParserService {
                     throw new SyntaxException("Expected whitespace after the conditional at line " + lineNumber);
                 }
                 nextToken = tokenizer.getNextToken();
+                if(!nextToken.getTokenType().equals(TokenTypes.LABEL)) {
+                    throw new SyntaxException("Expected label at line " + lineNumber);
+                }
                 String label = nextToken.getValue();
                 if (definedLabels.containsKey(label)) {
                     bytecode.add(definedLabels.get(label));
