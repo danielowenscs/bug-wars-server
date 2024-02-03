@@ -1,3 +1,42 @@
+CREATE TABLE IF NOT EXISTS game_maps (
+    id bigint,
+    height bigint,
+    width bigint,
+    body text,
+    name character varying(255)
+);
+
+CREATE TABLE IF NOT EXISTS sample_string (
+    id bigint,
+    content character varying(255)
+);
+
+CREATE TABLE IF NOT EXISTS roles (
+    id integer,
+    name character varying(20)
+);
+
+CREATE TABLE IF NOT EXISTS user_roles (
+    role_id integer,
+    user_id bigint
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id bigint,
+    email character varying(255),
+    password character varying(255),
+    username character varying(255)
+);
+
+CREATE TABLE IF NOT EXISTS scripts (
+    date_created date,
+    date_updated date,
+    owner_id bigint,
+    script_id bigint,
+    body text,
+    name character varying(255)
+);
+
 INSERT INTO roles (name)
 VALUES ('ROLE_ADMIN'), ('ROLE_USER'),('ROLE_GUEST')
 ON CONFLICT (name) DO NOTHING;
