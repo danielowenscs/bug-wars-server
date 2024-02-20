@@ -110,7 +110,8 @@ VALUES
 --GameMaps
 INSERT INTO game_maps (name,height,width,body)
 VALUES
-(E'Willy Wonka\'s Doghouse',5,5,E'11111\n10001\n10101\n11011\n11111'),
-('Crusader Saloon',7,7,E'1111111\n1000001\n1000001\n1000001\n1000001\n1000001\n1111111'),
-('Fiery Dragon Layer',3,3,E'111\n101\n111');
+(E'Willy Wonka\'s Doghouse',10,10,E'XXXXXXXXXX\nX   X    X\nX    X   X\nX        X\nX        X\nX   XX   X\nX        X\nXX       X\nX    X   X\nXXXXXXXXXX'),
+('Crusader Saloon',7,7,E'XXXXXXX\nX     X\nX     X\nX     X\nX     X\nX     X\nXXXXXXX'),
+('Fiery Dragon Layer',9,9,
+E'XXXXXXXXX\nX       X\nX       X\nX       X\nX       X\nX       X\nX       X\nX       X\nXXXXXXXXX');
 
