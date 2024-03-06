@@ -1,9 +1,30 @@
+DROP TABLE IF EXISTS terrain;
+DROP TABLE IF EXISTS entities;
+DROP TABLE IF EXISTS game_maps;
+
+CREATE TABLE IF NOT EXISTS terrain (
+    id serial,
+    name character varying(255),
+    image character varying(255),
+    CONSTRAINT PK_terrain PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS entities (
+    id serial,
+    name character varying(255),
+    code character,
+    image character varying(255),
+    CONSTRAINT PK_entities PRIMARY KEY (id)
+);
+
 CREATE TABLE IF NOT EXISTS game_maps (
-    id bigint,
-    height bigint,
-    width bigint,
+    id serial,
+    name character varying(255),
+    terrain_id int,
     body text,
-    name character varying(255)
+    image character varying(255),
+    CONSTRAINT PK_game_maps PRIMARY KEY (id),
+    CONSTRAINT FK_terrain FOREIGN KEY (terrain_id) REFERENCES terrain(id)
 );
 
 CREATE TABLE IF NOT EXISTS sample_string (
@@ -106,11 +127,4 @@ VALUES
 ('Guest Script B','LEFT','2024-01-28','2024-01-28',(SELECT id FROM users WHERE username = 'guest_user')),
 ('Guest Script C','RIGHT','2024-01-28','2024-01-28',(SELECT id FROM users WHERE username = 'guest_user')),
 ('Guest Script D','EAT','2024-01-28','2024-01-28',(SELECT id FROM users WHERE username = 'guest_user'));
-
---GameMaps
-INSERT INTO game_maps (name,height,width,body)
-VALUES
-(E'Willy Wonka\'s Doghouse',5,5,E'11111\n10001\n10101\n11011\n11111'),
-('Crusader Saloon',7,7,E'1111111\n1000001\n1000001\n1000001\n1000001\n1000001\n1111111'),
-('Fiery Dragon Layer',3,3,E'111\n101\n111');
 
