@@ -31,20 +31,20 @@ public class GameMapController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping()
-    public ResponseEntity<GameMap> postGameMap(@RequestBody GameMapRequest gameMapRequest, Principal principal) throws Exception{
-        GameMap gameMap = gameMapService.createNewGameMap(principal, gameMapRequest);
+    public ResponseEntity<GameMap> postGameMap(@RequestBody GameMapRequest gameMapRequest) throws Exception{
+        GameMap gameMap = gameMapService.createNewGameMap(gameMapRequest);
         return new ResponseEntity<>(gameMap, HttpStatus.CREATED);
     }
 
     @PutMapping("/{gameMapId}")
-    public ResponseEntity<GameMap> updateGameMap(@RequestBody GameMapRequest gameMapRequest, Principal principal, @PathVariable Long gameMapId) throws Exception{
-        GameMap gameMap = gameMapService.updateMap(principal, gameMapRequest, gameMapId);
+    public ResponseEntity<GameMap> updateGameMap(@PathVariable Long gameMapId, @RequestBody GameMapRequest gameMapRequest) throws Exception{
+        GameMap gameMap = gameMapService.updateMap(gameMapId, gameMapRequest);
         return new ResponseEntity<>(gameMap, HttpStatus.ACCEPTED);
     }
 
     @DeleteMapping("/{gameMapId}")
-    public ResponseEntity<String> deleteGameMap(@PathVariable Long gameMapId, Principal principal) throws Exception {
-        String response = gameMapService.deleteGameMapById(gameMapId, principal);
+    public ResponseEntity<String> deleteGameMap(@PathVariable Long gameMapId) throws Exception {
+        String response = gameMapService.deleteGameMapById(gameMapId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

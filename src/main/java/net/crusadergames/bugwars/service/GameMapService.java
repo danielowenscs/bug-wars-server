@@ -39,57 +39,38 @@ public class GameMapService {
         return mapList;
     }
 
-    public GameMap getGameMapById(Long gameMapId) throws Exception{
+    public GameMap getGameMapById(Long gameMapId) throws Exception {
         Optional<GameMap> optionalGameMap = gameMapRepository.findById(gameMapId);
         throwMapNotFound(optionalGameMap);
         GameMap gameMap = optionalGameMap.get();
         return gameMap;
     }
 
-    public GameMap createNewGameMap(Principal principal, GameMapRequest gameMapRequest) throws Exception {
-        if (!isAdmin(principal.getName())) {
-            throw new NotAnAdminException();
-        }
+    public GameMap createNewGameMap(GameMapRequest gameMapRequest) throws Exception {
+        throwMapNameOrBodyBlank(gameMapRequest);
 
-        if (gameMapRequest.getName().isBlank() || gameMapRequest.getBody().isBlank()) {
-            throw new MapNameOrBodyBlankException();
-        }
+        mapNameAlreadyExists(gameMapRequest.getName());
 
-        if (mapNameAlreadyExists(gameMapRequest.getName())) {
-            throw new MapNameAlreadyExistsException();
-        }
-
-        GameMap gameMap = new GameMap(null, gameMapRequest.getName(), gameMapRequest.getHeight(), gameMapRequest.getWidth(), gameMapRequest.getBody());
+        GameMap gameMap = new GameMap(null, gameMapRequest.getName(), gameMapRequest.getTerrainId(), gameMapRequest.getHeight(), gameMapRequest.getWidth(), gameMapRequest.getBody(), gameMapRequest.getImagePath());
         gameMap = gameMapRepository.save(gameMap);
         return gameMap;
     }
 
-    public GameMap updateMap(Principal principal, GameMapRequest gameMapRequest, Long gameMapId) throws Exception{
-        if (!isAdmin(principal.getName())) {
-            throw new NotAnAdminException();
-        }
-
-        if (gameMapRequest.getName().isBlank() || gameMapRequest.getBody().isBlank()) {
-            throw new MapNameOrBodyBlankException();
-        }
+    public GameMap updateMap(Long gameMapId, GameMapRequest gameMapRequest) throws Exception {
+        throwMapNameOrBodyBlank(gameMapRequest);
 
         Optional<GameMap> optionalGameMap = gameMapRepository.findById(gameMapId);
-
         throwMapNotFound(optionalGameMap);
 
-        GameMap newGameMap = new GameMap(gameMapId, gameMapRequest.getName(), gameMapRequest.getHeight(), gameMapRequest.getWidth(), gameMapRequest.getBody());
-        if (mapNameAlreadyExists(newGameMap.getName())) {
-            throw new MapNameAlreadyExistsException();
-        }
+        mapNameAlreadyExists(gameMapRequest.getName());
+
+        GameMap newGameMap = new GameMap(gameMapId, gameMapRequest.getName(), gameMapRequest.getTerrainId(), gameMapRequest.getHeight(), gameMapRequest.getWidth(), gameMapRequest.getBody(), gameMapRequest.getImagePath());
         gameMapRepository.save(newGameMap);
 
         return newGameMap;
     }
 
-    public String deleteGameMapById(Long gameMapId, Principal principal) throws Exception{
-        if (!isAdmin(principal.getName())) {
-            throw new NotAnAdminException();
-        }
+    public String deleteGameMapById(Long gameMapId) throws Exception{
         Optional<GameMap> optionalGameMap = gameMapRepository.findById(gameMapId);
         throwMapNotFound(optionalGameMap);
 
@@ -97,32 +78,22 @@ public class GameMapService {
         return ("Game map successfully deleted");
     }
 
-    public boolean isAdmin(String username) {
-        boolean hasAdminRole = false;
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isPresent()) {
-            User adminCheckUser = user.get();
-            for (Role role : adminCheckUser.getRoles()) {
-                if (role.getName().equals(ERole.ROLE_ADMIN)) {
-                    hasAdminRole = true;
-                    break;
-                }
-            }
-        }
-        return hasAdminRole;
-    }
-
-    public boolean mapNameAlreadyExists(String gameMapName) {
+    public void mapNameAlreadyExists(String gameMapName) throws Exception{
         Optional<GameMap> optionalGameMap = gameMapRepository.findByNameIgnoreCase(gameMapName);
         if (optionalGameMap.isPresent()) {
-            return true;
+            throw new MapNameAlreadyExistsException();
         }
-        return false;
+    }
+
+    public void throwMapNameOrBodyBlank(GameMapRequest gameMapRequest) throws Exception {
+        if (gameMapRequest.getName().isBlank() || gameMapRequest.getBody().isBlank()) {
+            throw new MapNameOrBodyBlankException();
+        }
     }
 
     private void throwMapNotFound(Optional<GameMap> gameMap) throws Exception {
         if (gameMap.isEmpty()) {
-            throw new NameNotFoundException("Map name not found");
+            throw new NameNotFoundException("Map not found");
         }
     }
 
