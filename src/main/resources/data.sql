@@ -110,6 +110,12 @@ VALUES
     ((SELECT id FROM users WHERE username = 'admin_user'), (SELECT id FROM roles WHERE name = 'ROLE_ADMIN'))
 ON CONFLICT (user_id, role_id) DO NOTHING;
 
+INSERT INTO terrain (name, image)
+VALUES ('grass', 'src\assets\images\grass.png');
+
+INSERT INTO game_maps (name, image, terrain_id, body)
+VALUES ('SampleMap', 'src\assets\images\map-0.png', 1, 'XXXXXXXXXXX\nX000010000X\nX000000000X\nX000000000X\nX000000000X\nX000000000X\nX000000000X\nX000000000X\nX000000000X\nX000000000X\nXXXXXXXXXXX\n');
+
 --Scripts
 INSERT INTO scripts (name,body,date_created,date_updated,owner_id)
 VALUES
